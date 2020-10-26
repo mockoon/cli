@@ -1,0 +1,40 @@
+{
+  "name": "@mockoon/cli",
+  "description": "Mockoon's CLI. Deploy your mocks anywhere.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Guillaume Monnet",
+    "email": "hi@255kb.dev",
+    "url": "https://255kb.dev/"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json"
+  },
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "files": [
+    "dist/*"
+  ],
+  "prettier": {
+    "singleQuote": true,
+    "tabWidth": 2,
+    "printWidth": 80,
+    "trailingComma": "none"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mockoon/cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mockoon/cli/issues"
+  },
+  "homepage": "https://github.com/mockoon/cli#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "14.10.2",
+    "prettier": "2.1.2",
+    "prettier-plugin-organize-imports": "1.1.1",
+    "typescript": "3.5.3"
+  }
+}
