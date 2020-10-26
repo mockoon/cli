@@ -9,10 +9,9 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json"
+    "build": "tsc -p tsconfig.json"
   },
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
+  "main": "./dist/index.js",
   "files": [
     "dist/*"
   ],
