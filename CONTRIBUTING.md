@@ -9,7 +9,7 @@
 
 Dependence between the three projects is high. 
 
-Therefore, contributions to this repository should always have a corresponding issue opened in the main application's repository and a child issue in the commons library's repository. 
+Therefore, contributions to this repository may, most of the time, have a corresponding issue opened in the main application's repository and, a child issue in the commons library's repository when needed. 
 
 ## Contribution rules
 
@@ -22,7 +22,7 @@ The following rules apply to all contributions:
 
 ## Work on your feature or bugfix
 
-- Start your `feature` or `fix` from `master`
+- Start your `feature` or `fix` from `main`
 - Preferably squash your commits, except when it makes sense to keep them separate (one refactoring + feature development)
 - Do not forget to add "Closes #xx" in one of the commit messages or in the pull request description (where xx is the GitHub issue number)
 
@@ -32,5 +32,5 @@ Branches naming convention:
 
 ## Open a pull request
 
-Open a pull request to be merge in the `master` branch. All branches should start from `master` and must be merged into `master`.
+Open a pull request to be merge in the `main` branch. All branches should start from `main` and must be merged into `main`.
 Ask maintainers to review the code and be prepared to rework your code if it does not match the style or do not follow the way it's usually done (typing, reducer, etc).
