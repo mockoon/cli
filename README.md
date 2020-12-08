@@ -13,9 +13,11 @@
   <br>
   <h1>@Mockoon/cli</h1>
 </div>
-[![npm version](https://img.shields.io/npm/v/@mockoon/cli.svg)](https://www.npmjs.com/package/@mockoon/cli)
 
-This is Mockoon&#39;s official CLI. It's a lightweight NPM package that allows you to deploy your mock APIs anywhere from a Mockoon export file. 
+Welcome to Mockoon's official CLI, a lightweight and fast NPM package to deploy your mock APIs anywhere. 
+Feed it with a Mockoon's [export file](https://mockoon.com/docs/latest/import-export-data/), and you are good to go. 
+
+The CLI supports the same features as the main application: [templating system](https://mockoon.com/docs/latest/templating/), [proxy mode](https://mockoon.com/docs/latest/proxy-mode/), [route response rules](https://mockoon.com/docs/latest/multiple-responses/), etc.
 
 ![Mockoon CLI screenshot](./docs/screenshot.png)
 
@@ -57,7 +59,7 @@ To export your environment(s) to use them in the CLI, follow these steps:
   
     ![Export to a file](/docs/export-to-file.png)
   
-    > Alternative: You can also right-click on one of the environments and select `Copy to clipboard (JSON)`. You will then have to manually create a file and paste the environment's JSON data.
+    > You can also right-click on one of the environments and select `Copy to clipboard (JSON)`. You will then have to manually create a file and paste the environment's JSON data.
   
     ![Export to a file](/docs/export-to-clipboard.png)
   
@@ -68,6 +70,8 @@ To export your environment(s) to use them in the CLI, follow these steps:
     ```sh-sessions
     $ mockoon start --data ~/path/to/your-file.json -i 0
     ```
+
+You will find more details in the [official documentation](https://mockoon.com/docs/latest/import-export-data/).
 
 ## Commands
 
@@ -80,7 +84,7 @@ To export your environment(s) to use them in the CLI, follow these steps:
 ### `mockoon start`
 
 Starts a mock API from a Mockoon's export file environment. As an export file can contain multiple environments, you can indicate the one you want to run by specifying its index in the file or its name.
-The process will be created by default with the name and port of the Mockoon's environment. This values can be overriden by using the `--port` and `--pname` flags.
+The process will be created by default with the name and port of the Mockoon's environment. You can override these values by using the `--port` and `--pname` flags.
 
 ```
 USAGE
@@ -102,7 +106,7 @@ EXAMPLES
 
 ### `mockoon list`
 
-Lists the running mock APIs and display some basic information: process name, pid, port, cpu, memory
+Lists the running mock APIs and display some information: process name, pid, status, cpu, memory, port.
 
 ```
 USAGE
@@ -117,7 +121,7 @@ EXAMPLE
 
 ### `mockoon info [ID]`
 
-Returns some information about a running mock API: process name, pid, port, cpu, memory
+Returns some information about a running mock API: process name, pid, status, cpu, memory, port.
 
 ```
 USAGE
@@ -175,11 +179,11 @@ Logs are located in `~/.mockoon-cli/logs/{mock-name}-[error|out].log`.
 
 The `error.log` file contains mostly server errors that occur at startup time and prevent the mock API to run (port already in use, etc.). They shouldn't occur that often.
 
-The `out.log` file contains all other log entries (all levels) produced by the running mock server. Most of the errors occurring in Mockoon CLI (or the main application) are not critical and therefore considered as normal output. As an example, if the JSON body from an entering request is erroneous, Mockoon will log a JSON parsing error, but it won't block the normal execution of the application..
+The `out.log` file contains all other log entries (all levels) produced by the running mock server. Most of the errors occurring in Mockoon CLI (or the main application) are not critical and therefore considered as normal output. As an example, if the JSON body from an entering request is erroneous, Mockoon will log a JSON parsing error, but it won't block the normal execution of the application.
 
 ## PM2
 
-Mockoon CLI uses [PM2](https://pm2.keymetrics.io/) to start, stop or list the running mock APIs. Therefore, you can directly use PM2 in order to manage the processes. 
+Mockoon CLI uses [PM2](https://pm2.keymetrics.io/) to start, stop or list the running mock APIs. Therefore, you can directly use PM2 commands to manage the processes. 
 
 ## Mockoon's documentation
 
@@ -194,7 +198,7 @@ You can also  [sponsor the maintainer (255kb) on GitHub](https://github.com/spon
 
 ## Support/feedback
 
-You can discuss all things related to Mockoon, and ask for help, on the [official community](https://github.com/mockoon/mockoon/discussions). It's also a good place to discuss bugs and feature requests before opening an issue on this repository.
+You can discuss all things related to Mockoon and the CLI, and ask for help, on the [official community](https://github.com/mockoon/mockoon/discussions). It's also a good place to discuss bugs and feature requests before opening an issue on this repository.
 
 ## Contributing
 
