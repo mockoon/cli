@@ -1,11 +1,13 @@
 import { Command } from '@oclif/command';
 import { ProcessDescription } from 'pm2';
+import { format } from 'util';
 import { commonFlags } from '../constants/command.constants';
+import { Messages } from '../constants/messages.constants';
 import { ProcessManager } from '../libs/process-manager';
 import { logProcesses } from '../libs/utils';
 
 export default class Info extends Command {
-  public static description = 'Return info for a specific mock API';
+  public static description = 'Display information for a running mock API';
 
   public static examples = [
     '$ mockoon info 0',
@@ -34,9 +36,13 @@ export default class Info extends Command {
       const processes: ProcessDescription[] = await ProcessManager.info(
         args.id
       );
-      logProcesses(processes);
+
+      if (processes.length) {
+        logProcesses(processes);
+      } else {
+        this.log(format(Messages.CLI.NO_RUNNING_PROCESS_FOUND, args.id));
+      }
     } catch (error) {
-      // TODO returns no error if pid does not exists
       this.error(error.message);
     } finally {
       ProcessManager.disconnect();

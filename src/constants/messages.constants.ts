@@ -12,6 +12,7 @@ export const Messages = {
       Config.logsPath,
       '%s-error.log'
     )})`,
+    NO_RUNNING_PROCESS_FOUND: 'No process found with pid or name "%s"',
     NO_RUNNING_PROCESS: 'No process is running',
     MISSING_INDEX_OR_NAME_ERROR:
       '--index or --name is missing, you must provide one of them',
