@@ -51,7 +51,7 @@ describe('Data loading', () => {
     .command(['start', '--data', './test/data/old-format.json', '-i', '0'])
     .catch((context) => {
       expect(context.message).to.contain(
-        'This export file is too old and cannot be run with the CLI.'
+        'This export file is too old and cannot be run with the CLI'
       );
     })
     .it('should fail when data is in old format');

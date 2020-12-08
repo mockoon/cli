@@ -70,11 +70,11 @@ export default class Start extends Command {
     }
 
     if (!portIsValid(environmentInfo.port)) {
-      this.error(Messages.CLI.PORT_IS_NOT_VALID);
+      this.error(format(Messages.CLI.PORT_IS_NOT_VALID, environmentInfo.port));
     }
 
     if (await portInUse(environmentInfo.port)) {
-      this.error(Messages.CLI.PORT_ALREADY_USED);
+      this.error(format(Messages.CLI.PORT_ALREADY_USED, environmentInfo.port));
     }
 
     await ProcessManager.connect();

@@ -19,7 +19,7 @@ describe('Run two mocks on the same port', () => {
     .stderr()
     .command(['start', '--data', sampleDataPath, '-i', '1'])
     .catch((context) => {
-      expect(context.message).to.contain('Port is already used');
+      expect(context.message).to.contain('Port "3000" is already in use');
     })
     .it('should fail starting second mock on same port');
 
@@ -71,7 +71,7 @@ describe('Run two mocks with same name', () => {
     .command(['start', '--data', sampleDataPath, '-i', '2', '--port', '3001'])
     .catch((context) => {
       expect(context.message).to.contain(
-        'A process with the name "mock1" is already running.'
+        'A process with the name "mock1" is already running'
       );
     })
     .it('should fail starting second mock on port 3001 due to name error');

@@ -27,7 +27,7 @@ describe('Start command', () => {
     .stderr()
     .command(['start', '--data', sampleDataPath, '-i', '0', '--port', '999999'])
     .catch((context) => {
-      expect(context.message).to.contain('Port is not valid');
+      expect(context.message).to.contain('Port "999999" is invalid');
     })
     .it('should fail when a port is invalid');
 });
