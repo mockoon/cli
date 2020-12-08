@@ -17,7 +17,7 @@ describe('Data loading', () => {
     .command(['start', '--data', './test/data/broken-data.json', '-i', '0'])
     .catch((context) => {
       expect(context.message).to.contain(
-        'Unexpected token D in JSON at position 53'
+        'Unexpected token D in JSON at position'
       );
     })
     .it('should fail when JSON data is invalid');
