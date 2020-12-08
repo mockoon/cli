@@ -20,6 +20,13 @@ The following rules apply to all contributions:
 - Pull requests must refer to an open issue which must itself stem from a main repository's issue. Pull requests not solving existing issues may not be accepted.
 - Issues and PR must follow the provided templates.
 
+## Run the application in dev mode
+
+- Clone the repository: `git@github.com:mockoon/cli.git`
+- Run `npm install`.
+- Run `npm run build`.
+- Test commands with `./bin/run [command] [...args] [...flags]`.
+
 ## Work on your feature or bugfix
 
 - Start your `feature` or `fix` from `main`
