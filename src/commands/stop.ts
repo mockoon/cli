@@ -40,8 +40,6 @@ export default class Stop extends Command {
         args.id
       )) as ProcessDescription[];
 
-      // TODO if stopping an 'errored' process we don't get a result
-
       // verify that something has been stopped
       stoppedProcesses.forEach((stoppedProcess) => {
         if (stoppedProcess !== undefined) {

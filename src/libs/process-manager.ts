@@ -61,7 +61,6 @@ export const ListManager = {
     let configProcesses: ConfigProcess[] = ListManager.getProcesses();
 
     configProcesses = configProcesses.filter((data) => data.name !== name);
-    console.log(configProcesses);
 
     jsonWriteFileSync(processFile, configProcesses, { spaces: 2 });
   }

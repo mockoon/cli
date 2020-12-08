@@ -106,6 +106,9 @@ export default class Start extends Command {
       });
 
       if (process[0].pm2_env.status === 'errored') {
+        // if process is errored we want to delete it
+        await ProcessManager.delete(environmentInfo.name);
+
         this.error(
           format(
             Messages.CLI.PROCESS_START_LOG_ERROR,

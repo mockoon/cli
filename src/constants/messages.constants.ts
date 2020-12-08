@@ -22,9 +22,9 @@ export const Messages = {
       "These environment's data are too old and cannot be run with the CLI. Please migrate them using a more recent version of the application",
     DATA_TOO_RECENT_ERROR:
       "These environment's data are too recent and cannot be run with the CLI. Please update the CLI with the following command 'npm install -g @mockoon/cli'",
-    ENVIRONMENT_NOT_FOUND_INDEX_ERROR: 'Environment not found at index %d',
+    ENVIRONMENT_NOT_FOUND_INDEX_ERROR: 'Environment not found at index "%d"',
     ENVIRONMENT_NOT_FOUND_NAME_ERROR:
-      'Environment with name %s cannot be found',
+      'Environment with name "%s" cannot be found',
     PORT_ALREADY_USED: 'Port is already used',
     PORT_IS_NOT_VALID: 'Port is not valid'
   },

@@ -8,9 +8,7 @@ describe('Data loading', () => {
     .stderr()
     .command(['start', '--data', './non-existing-file.json', '-i', '0'])
     .catch((context) => {
-      expect(context.message).to.contain(
-        "ENOENT: no such file or directory, open './non-existing-file.json'"
-      );
+      expect(context.message).to.contain('ENOENT: no such file or directory');
     })
     .it('should fail when data file cannot be found');
 
@@ -19,7 +17,7 @@ describe('Data loading', () => {
     .command(['start', '--data', './test/data/broken-data.json', '-i', '0'])
     .catch((context) => {
       expect(context.message).to.contain(
-        'Unexpected token : in JSON at position 61'
+        'Unexpected token D in JSON at position 53'
       );
     })
     .it('should fail when JSON data is invalid');
@@ -28,7 +26,7 @@ describe('Data loading', () => {
     .stderr()
     .command(['start', '--data', sampleDataPath, '-i', '99'])
     .catch((context) => {
-      expect(context.message).to.contain('Environment not found at index 99');
+      expect(context.message).to.contain('Environment not found at index "99"');
     })
     .it('should fail when there is no environment at index');
 
@@ -43,7 +41,7 @@ describe('Data loading', () => {
     ])
     .catch((context) => {
       expect(context.message).to.contain(
-        'Environment with name non-existing-environment-name cannot be found'
+        'Environment with name "non-existing-environment-name" cannot be found'
       );
     })
     .it('should fail when there is no environment with requested name');
@@ -57,6 +55,4 @@ describe('Data loading', () => {
       );
     })
     .it('should fail when data is in old format');
-
-  //TODO test parse fail
 });
