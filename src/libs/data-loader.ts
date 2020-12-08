@@ -6,6 +6,7 @@ import {
   Migrations
 } from '@mockoon/commons';
 import { promises as fs } from 'fs';
+import { readFile as readJSONFile } from 'jsonfile';
 import * as mkdirp from 'mkdirp';
 import { join } from 'path';
 import { format } from 'util';
@@ -19,7 +20,7 @@ import { transformEnvironmentName } from './utils';
  * @param filePath
  */
 export const parseDataFile = async <T>(filePath: string): Promise<T> =>
-  JSON.parse(await fs.readFile(filePath, 'utf-8'));
+  await readJSONFile(filePath, 'utf-8');
 
 /**
  * Check if an environment can be run by the CLI and

@@ -4,6 +4,7 @@ import {
   ServerErrorCodes,
   Transaction
 } from '@mockoon/commons';
+import { readFileSync as readJSONFileSync } from 'jsonfile';
 import * as minimist from 'minimist';
 import { format } from 'util';
 import {
@@ -12,7 +13,6 @@ import {
   transports as logsTransports
 } from 'winston';
 import { Messages } from '../constants/messages.constants';
-import { parseDataFile } from './data-loader';
 
 const logger = createLogger({
   level: 'info',
@@ -41,7 +41,7 @@ const addEventListeners = function (
       errorCode === ServerErrorCodes.PORT_INVALID ||
       errorCode === ServerErrorCodes.UNKNOWN_SERVER_ERROR
     ) {
-      throw error;
+      throw new Error(error?.message);
     }
 
     // report non blocking errors
@@ -81,15 +81,14 @@ const addEventListeners = function (
 };
 
 if (argv.data) {
-  parseDataFile<Environment>(argv.data)
-    .then((environment) => {
-      const server = new MockoonServer(environment);
+  try {
+    const environment: Environment = readJSONFileSync(argv.data);
+    const server = new MockoonServer(environment);
 
-      addEventListeners(server, environment);
+    addEventListeners(server, environment);
 
-      server.start();
-    })
-    .catch((error) => {
-      throw error;
-    });
+    server.start();
+  } catch (error) {
+    throw new Error(error.message);
+  }
 }
