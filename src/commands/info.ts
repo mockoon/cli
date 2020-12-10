@@ -30,8 +30,6 @@ export default class Info extends Command {
   public async run(): Promise<void> {
     const { args } = this.parse(Info);
 
-    await ProcessManager.connect();
-
     try {
       const processes: ProcessDescription[] = await ProcessManager.info(
         args.id

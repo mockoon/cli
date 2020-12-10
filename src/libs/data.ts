@@ -9,6 +9,7 @@ import { promises as fs } from 'fs';
 import { readFile as readJSONFile } from 'jsonfile';
 import * as mkdirp from 'mkdirp';
 import { join } from 'path';
+import { ProcessDescription } from 'pm2';
 import { format } from 'util';
 import { Config } from '../config';
 import { Messages } from '../constants/messages.constants';
@@ -147,4 +148,24 @@ export const prepareData = async (
     port: environment.port,
     dataFile
   };
+};
+
+/**
+ * Clean the temporary data files by deleting the ones with no
+ * matching running process
+ *
+ * @param processes
+ */
+export const cleanDataFiles = async (
+  processes: ProcessDescription[]
+): Promise<void> => {
+  const files = await fs.readdir(Config.dataPath);
+
+  files.forEach(async (file) => {
+    if (
+      processes.findIndex((process) => `${process.name}.json` === file) === -1
+    ) {
+      await fs.unlink(join(Config.dataPath, file));
+    }
+  });
 };

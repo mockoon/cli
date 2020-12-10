@@ -4,7 +4,6 @@ import {
   writeFileSync as jsonWriteFileSync
 } from 'jsonfile';
 import { sync as mkdirpSync } from 'mkdirp';
-import { join } from 'path';
 import * as pm2 from 'pm2';
 import { Proc, ProcessDescription } from 'pm2';
 import { promisify } from 'util';
@@ -16,8 +15,9 @@ export type ConfigProcess = {
   port: number;
 };
 
-const processFile: string = join(Config.configPath, 'processes.json');
-
+/**
+ * Manage the file containing the running processes list
+ */
 export const ProcessListManager = {
   addProcess: async (configProcess: ConfigProcess): Promise<void> => {
     mkdirpSync(Config.configPath);
@@ -32,16 +32,18 @@ export const ProcessListManager = {
     ) {
       configData.push(configProcess);
 
-      return await writeFile(processFile, configData, { spaces: 2 });
+      return await writeFile(Config.processesFilePath, configData, {
+        spaces: 2
+      });
     }
   },
   getProcesses: (): ConfigProcess[] => {
     let configProcesses: ConfigProcess[] = [];
 
     try {
-      configProcesses = jsonReadFileSync(processFile);
+      configProcesses = jsonReadFileSync(Config.processesFilePath);
     } catch (error) {
-      jsonWriteFileSync(processFile, configProcesses);
+      jsonWriteFileSync(Config.processesFilePath, configProcesses);
     }
 
     return configProcesses;
@@ -55,19 +57,23 @@ export const ProcessListManager = {
       configProcesses.filter((conf) => conf.name === process.name);
     });
 
-    return await writeFile(processFile, configProcesses, { spaces: 2 });
+    return await writeFile(Config.processesFilePath, configProcesses, {
+      spaces: 2
+    });
   },
   deleteProcess: (name?: string): void => {
     let configProcesses: ConfigProcess[] = ProcessListManager.getProcesses();
 
     configProcesses = configProcesses.filter((data) => data.name !== name);
 
-    jsonWriteFileSync(processFile, configProcesses, { spaces: 2 });
+    jsonWriteFileSync(Config.processesFilePath, configProcesses, { spaces: 2 });
   }
 };
 
+/**
+ * Promisify PM2 methods
+ */
 export const ProcessManager = {
-  connect: promisify(pm2.connect.bind(pm2)),
   info: promisify(pm2.describe.bind(pm2)),
   list: async (): Promise<ProcessDescription[]> => {
     const processes = await promisify(pm2.list.bind(pm2))();

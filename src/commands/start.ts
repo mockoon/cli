@@ -5,7 +5,7 @@ import { format } from 'util';
 import { Config } from '../config';
 import { commonFlags } from '../constants/command.constants';
 import { Messages } from '../constants/messages.constants';
-import { prepareData } from '../libs/data-loader';
+import { prepareData } from '../libs/data';
 import {
   ConfigProcess,
   ProcessListManager,
@@ -76,8 +76,6 @@ export default class Start extends Command {
     if (await portInUse(environmentInfo.port)) {
       this.error(format(Messages.CLI.PORT_ALREADY_USED, environmentInfo.port));
     }
-
-    await ProcessManager.connect();
 
     try {
       const runningProcesses: ProcessDescription[] = await ProcessManager.list();

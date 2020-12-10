@@ -14,8 +14,6 @@ export default class List extends Command {
   };
 
   public async run(): Promise<void> {
-    await ProcessManager.connect();
-
     try {
       const processes: ProcessDescription[] = await ProcessManager.list();
 

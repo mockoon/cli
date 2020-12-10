@@ -1,11 +1,8 @@
 import { Command } from '@oclif/command';
-import { unlink } from 'fs';
-import { join } from 'path';
 import { ProcessDescription } from 'pm2';
-import { Config } from '../config';
 import { commonFlags } from '../constants/command.constants';
 import { Messages } from '../constants/messages.constants';
-import { ListManager, ProcessManager } from '../libs/process-manager';
+import { cleanDataFiles } from '../libs/data';
 import { ProcessListManager, ProcessManager } from '../libs/process-manager';
 import { logProcesses } from '../libs/utils';
 
@@ -32,8 +29,7 @@ export default class Stop extends Command {
 
   public async run(): Promise<void> {
     const { args } = this.parse(Stop);
-
-    await ProcessManager.connect();
+    let relistProcesses = false;
 
     try {
       // typing is wrong, delete() returns an array
@@ -44,11 +40,6 @@ export default class Stop extends Command {
       // verify that something has been stopped
       stoppedProcesses.forEach((stoppedProcess) => {
         if (stoppedProcess !== undefined) {
-          unlink(
-            join(Config.dataPath, `${stoppedProcess.name}.json`),
-            () => {}
-          );
-
           this.log(
             Messages.CLI.PROCESS_STOPPED,
             stoppedProcess.pm_id,
@@ -58,32 +49,34 @@ export default class Stop extends Command {
           ProcessListManager.deleteProcess(stoppedProcess.name);
         }
       });
-
-      ProcessManager.disconnect();
-
-      return;
     } catch (error) {
       if (error.message === 'process name not found' && args.id === 'all') {
         // if 'all' was specified and no process was stopped, do not list and immediately exit
         this.log(Messages.CLI.NO_RUNNING_PROCESS);
-
-        ProcessManager.disconnect();
-
-        return;
       } else {
-        // do not exit as we want to list processes again
         this.error(error.message, { exit: false });
+        relistProcesses = true;
       }
     }
 
     try {
       const processes: ProcessDescription[] = await ProcessManager.list();
-      this.log(Messages.CLI.RUNNING_PROCESSES);
-      logProcesses(processes);
+
+      if (relistProcesses) {
+        if (processes.length) {
+          this.log(Messages.CLI.RUNNING_PROCESSES);
+          logProcesses(processes);
+        } else {
+          this.log(Messages.CLI.NO_RUNNING_PROCESS);
+        }
+      }
+
+      // always clean data files after a stop
+      await cleanDataFiles(processes);
     } catch (error) {
-      this.error(error.message);
-    } finally {
-      ProcessManager.disconnect();
+      this.error(error.message, { exit: false });
     }
+
+    ProcessManager.disconnect();
   }
 }
