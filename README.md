@@ -198,7 +198,7 @@ You can also  [sponsor the maintainer (255kb) on GitHub](https://github.com/spon
 
 ## Support/feedback
 
-You can discuss all things related to Mockoon and the CLI, and ask for help, on the [official community](https://github.com/mockoon/mockoon/discussions). It's also a good place to discuss bugs and feature requests before opening an issue on this repository.
+You can discuss all things related to Mockoon's CLI, and ask for help, on the [official community](https://github.com/mockoon/cli/discussions). It's also a good place to discuss bugs and feature requests before opening an issue on this repository.
 
 ## Contributing
 
