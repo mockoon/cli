@@ -6,7 +6,7 @@ import {
 import { sync as mkdirpSync } from 'mkdirp';
 import { join } from 'path';
 import * as pm2 from 'pm2';
-import { ProcessDescription } from 'pm2';
+import { Proc, ProcessDescription } from 'pm2';
 import { promisify } from 'util';
 import { Config } from '../config';
 
@@ -18,11 +18,11 @@ export type ConfigProcess = {
 
 const processFile: string = join(Config.configPath, 'processes.json');
 
-export const ListManager = {
+export const ProcessListManager = {
   addProcess: async (configProcess: ConfigProcess): Promise<void> => {
     mkdirpSync(Config.configPath);
 
-    const configData: ConfigProcess[] = ListManager.getProcesses();
+    const configData: ConfigProcess[] = ProcessListManager.getProcesses();
 
     if (
       !configData.find(
@@ -50,7 +50,7 @@ export const ListManager = {
     processes: pm2.ProcessDescription[]
   ): Promise<void> => {
     const configProcesses: ConfigProcess[] =
-      processes.length > 0 ? ListManager.getProcesses() : [];
+      processes.length > 0 ? ProcessListManager.getProcesses() : [];
     processes.forEach((process) => {
       configProcesses.filter((conf) => conf.name === process.name);
     });
@@ -58,7 +58,7 @@ export const ListManager = {
     return await writeFile(processFile, configProcesses, { spaces: 2 });
   },
   deleteProcess: (name?: string): void => {
-    let configProcesses: ConfigProcess[] = ListManager.getProcesses();
+    let configProcesses: ConfigProcess[] = ProcessListManager.getProcesses();
 
     configProcesses = configProcesses.filter((data) => data.name !== name);
 
@@ -71,14 +71,13 @@ export const ProcessManager = {
   info: promisify(pm2.describe.bind(pm2)),
   list: async (): Promise<ProcessDescription[]> => {
     const processes = await promisify(pm2.list.bind(pm2))();
-    await ListManager.updateProcesses(processes);
+    await ProcessListManager.updateProcesses(processes);
 
     return processes;
   },
-  start: <(options: pm2.StartOptions) => Promise<pm2.Proc>>(
+  start: <(options: pm2.StartOptions) => Promise<Proc>>(
     promisify(pm2.start.bind(pm2))
   ),
-  stop: promisify(pm2.stop.bind(pm2)),
   delete: promisify(pm2.delete.bind(pm2)),
   disconnect: pm2.disconnect.bind(pm2)
 };

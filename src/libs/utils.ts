@@ -2,10 +2,10 @@ import { cli } from 'cli-ux';
 import * as isPortReachable from 'is-port-reachable';
 import { ProcessDescription } from 'pm2';
 import * as prettyBytes from 'pretty-bytes';
-import { ConfigProcess, ListManager } from './process-manager';
+import { ConfigProcess, ProcessListManager } from './process-manager';
 
 export const logProcesses = (processes: ProcessDescription[]): void => {
-  const configProcesses: ConfigProcess[] = ListManager.getProcesses();
+  const configProcesses: ConfigProcess[] = ProcessListManager.getProcesses();
 
   cli.table(
     processes,

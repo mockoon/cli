@@ -6,6 +6,7 @@ import { Config } from '../config';
 import { commonFlags } from '../constants/command.constants';
 import { Messages } from '../constants/messages.constants';
 import { ListManager, ProcessManager } from '../libs/process-manager';
+import { ProcessListManager, ProcessManager } from '../libs/process-manager';
 import { logProcesses } from '../libs/utils';
 
 export default class Stop extends Command {
@@ -54,7 +55,7 @@ export default class Stop extends Command {
             stoppedProcess.name
           );
 
-          ListManager.deleteProcess(stoppedProcess.name);
+          ProcessListManager.deleteProcess(stoppedProcess.name);
         }
       });
 

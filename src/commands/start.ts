@@ -8,7 +8,7 @@ import { Messages } from '../constants/messages.constants';
 import { prepareData } from '../libs/data-loader';
 import {
   ConfigProcess,
-  ListManager,
+  ProcessListManager,
   ProcessManager
 } from '../libs/process-manager';
 import { portInUse, portIsValid } from '../libs/utils';
@@ -129,7 +129,7 @@ export default class Start extends Command {
         port: environmentInfo.port,
         pid: process[0].pm2_env.pm_id
       };
-      await ListManager.addProcess(configProcess);
+      await ProcessListManager.addProcess(configProcess);
     } catch (error) {
       this.error(error.message);
     } finally {
