@@ -83,7 +83,15 @@ const addEventListeners = function (
 if (argv.data) {
   try {
     const environment: Environment = readJSONFileSync(argv.data);
-    const server = new MockoonServer(environment);
+    const server = new MockoonServer(environment, {
+      logProvider: () => ({
+        log: logger.log.bind(logger),
+        debug: logger.debug.bind(logger),
+        info: logger.info.bind(logger),
+        warn: logger.warn.bind(logger),
+        error: logger.error.bind(logger)
+      })
+    });
 
     addEventListeners(server, environment);
 
