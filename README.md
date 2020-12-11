@@ -23,6 +23,7 @@ The CLI supports the same features as the main application: [templating system](
 
 - [Installation](#installation)
 - [Export your mock to use in the CLI](#export-your-mock-to-use-in-the-cli)
+- [Compatibility](#compatibility)
 - [Commands](#commands)
   - [`mockoon start`](#mockoon-start)
   - [`mockoon list`](#mockoon-list)
@@ -72,6 +73,16 @@ To export your environment(s) to use them in the CLI, follow these steps:
     ```
 
 You will find more details in the [official documentation](https://mockoon.com/docs/latest/import-export-data/).
+
+## Compatibility
+
+### Node.js
+
+Mockoon's CLI has been tested on Node.js versions 10, 12, 14, and 15.
+
+### Mockoon data files
+
+The CLI can import and migrate data from older versions of Mockoon. If you exported the data file with a more recent version of the application, you may need to update your CLI with the following command: `npm install -g @mockoon/cli`.
 
 ## Commands
 
