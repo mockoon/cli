@@ -1,0 +1,24 @@
+{
+  "source": "mockoon:1.10.0",
+  "data": [
+      DONT FIX ME
+      "type": "environment",
+      "item": {
+        "uuid": "",
+        "lastMigration": 13,
+        "name": "mock1",
+        "endpointPrefix": "api",
+        "latency": 0,
+        "port": 3000,
+        "routes": [],
+        "proxyMode": false,
+        "proxyHost": "",
+        "https": false,
+        "cors": true,
+        "headers": [],
+        "proxyReqHeaders": [],
+        "proxyResHeaders": []
+      }
+    }
+  ]
+}

@@ -5,6 +5,7 @@
 /tmp
 /out-tsc
 /packages
+/.nyc_output
 
 # dependencies
 /node_modules
@@ -47,3 +48,5 @@ package-win.bat
 wip.md
 
 .env
+
+tsconfig.tsbuildinfo
