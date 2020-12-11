@@ -1,7 +1,7 @@
 {
   "name": "@mockoon/cli",
   "description": "Mockoon's CLI. Deploy your mock APIs anywhere.",
-  "version": "0.1.0",
+  "version": "0.1.0-beta.0",
   "author": {
     "name": "Guillaume Monnet",
     "email": "hi@255kb.dev",
