@@ -1,5 +1,5 @@
 import { Command, flags } from '@oclif/command';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { Proc, ProcessDescription } from 'pm2';
 import { format } from 'util';
 import { Config } from '../config';
@@ -99,7 +99,7 @@ export default class Start extends Command {
         error: join(Config.logsPath, `${environmentInfo.name}-error.log`),
         output: join(Config.logsPath, `${environmentInfo.name}-out.log`),
         name: environmentInfo.name,
-        script: 'dist/libs/server.js',
+        script: resolve(__dirname, '../libs/server.js'),
         exec_mode: 'fork'
       });
 
