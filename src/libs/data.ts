@@ -10,7 +10,7 @@ import { readFile as readJSONFile } from 'jsonfile';
 import * as mkdirp from 'mkdirp';
 import { join } from 'path';
 import { ProcessDescription } from 'pm2';
-import * as fetch from 'node-fetch';
+import axios from 'axios';
 import { format } from 'util';
 import { Config } from '../config';
 import { Messages } from '../constants/messages.constants';
@@ -21,12 +21,15 @@ import { transformEnvironmentName } from './utils';
  *
  * @param filePath
  */
-export const parseDataFile = <T>(filePath: string): Promise<T> => {
+export const parseDataFile = async <T>(filePath: string): Promise<T> => {
   if(filePath.indexOf('http') !== 0) {
     return readJSONFile(filePath, 'utf-8');
   }
 
-  return fetch(filePath, { timeout: 5000 }).then(res => res.json());
+  let { data } = await axios.get(filePath, { timeout: 5000 });
+  data = (typeof data === 'string') ? JSON.parse(data) : data;
+
+  return data;
 };
 
 /**

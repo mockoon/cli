@@ -16,15 +16,15 @@ describe('Data loading', () => {
     .stderr()
     .command(['start', '--data', 'https://example.org', '-i', '0'])
     .catch((context) => {
-      expect(context.message).to.contain('invalid json response body');
+      expect(context.message).to.contain('Unexpected token < in JSON at position');
     })
     .it('should fail when the response is no valid JSON');
 
   test
     .stderr()
-    .command(['start', '--data', 'https//malformed-url', '-i', '0'])
+    .command(['start', '--data', 'https://malformed url', '-i', '0'])
     .catch((context) => {
-      expect(context.message).to.contain('Only absolute URLs are supported');
+      expect(context.message).to.contain('getaddrinfo ENOTFOUND');
     })
     .it('should fail when the URL is invalid');
 
@@ -41,7 +41,7 @@ describe('Data loading', () => {
     .stderr()
     .command(['start', '--data', 'https://www.google.com:81', '-i', '0'])
     .catch((context) => {
-      expect(context.message).to.contain('network timeout');
+      expect(context.message).to.contain('timeout');
     })
     .it('should fail when there is no response');
 
