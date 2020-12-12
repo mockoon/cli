@@ -54,6 +54,7 @@
     "jsonfile": "6.1.0",
     "minimist": "1.2.5",
     "mkdirp": "1.0.4",
+    "node-fetch": "2.6.1",
     "pm2": "4.5.0",
     "pretty-bytes": "5.4.1",
     "tail": "2.0.4",
