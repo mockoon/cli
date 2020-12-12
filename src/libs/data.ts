@@ -25,8 +25,9 @@ export const parseDataFile = <T>(filePath: string): Promise<T> => {
   if(filePath.indexOf('http') !== 0) {
     return readJSONFile(filePath, 'utf-8');
   }
+
   return fetch(filePath, { timeout: 5000 }).then(res => res.json());
-}
+};
 
 /**
  * Check if an environment can be run by the CLI and
