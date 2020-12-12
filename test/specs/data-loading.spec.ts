@@ -24,7 +24,8 @@ describe('Data loading', () => {
     .stderr()
     .command(['start', '--data', 'https://malformed url', '-i', '0'])
     .catch((context) => {
-      expect(context.message).to.contain('getaddrinfo ENOTFOUND');
+      const contains = context.message.indexOf('getaddrinfo ENOTFOUND') >= 0 || context.message.indexOf('getaddrinfo EAI_AGAIN') >= 0;
+      expect(contains).to.eql(true);
     })
     .it('should fail when the URL is invalid');
 
