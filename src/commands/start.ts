@@ -1,11 +1,13 @@
+import { Export } from '@mockoon/commons';
 import { Command, flags } from '@oclif/command';
+import * as inquirer from 'inquirer';
 import { join, resolve } from 'path';
 import { Proc, ProcessDescription } from 'pm2';
 import { format } from 'util';
 import { Config } from '../config';
 import { commonFlags } from '../constants/command.constants';
 import { Messages } from '../constants/messages.constants';
-import { prepareData } from '../libs/data';
+import { listEnvironments, parseDataFile, prepareData } from '../libs/data';
 import {
   ConfigProcess,
   ProcessListManager,
@@ -56,7 +58,20 @@ export default class Start extends Command {
     let environmentInfo: { name: any; port: any; dataFile: string };
 
     if (userFlags.index === undefined && !userFlags.name) {
-      this.error(Messages.CLI.MISSING_INDEX_OR_NAME_ERROR);
+      // Prompt for environment
+      const environments = await parseDataFile<Export>(userFlags.data).then(data => listEnvironments(data));
+
+      if(environments.length === 0) {
+        this.error(Messages.CLI.ENVIRONMENT_NOT_AVAILABLE_ERROR);
+      }
+
+      const response: { environment: string} = await inquirer.prompt([{
+        name: 'environment',
+        message: 'select an environment',
+        type: 'list',
+        choices: environments.map(e => ({ name: e.name }))
+      }]);
+      userFlags.name = response.environment;
     }
 
     try {

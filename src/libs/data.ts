@@ -60,6 +60,22 @@ const migrateEnvironment = (environment: Environment) => {
 };
 
 /**
+ * List all environments of a data file. Extract all environments, eventually filter items of type 'route'
+ *
+ * @param data
+ */
+export const listEnvironments = (data: Export): Environments => data.data.reduce<Environments>(
+  (newEnvironments, dataItem) => {
+    if (dataItem.type === 'environment') {
+      newEnvironments.push(dataItem.item);
+    }
+
+    return newEnvironments;
+  },
+  []
+);
+
+/**
  * Check if data file is in the new format (with data and source)
  * and return the environment by index or name
  *
@@ -75,17 +91,8 @@ const getEnvironment = (
     throw new Error(Messages.CLI.DATA_FILE_TOO_OLD_ERROR);
   }
 
-  // extract all environments, eventually filter items of type 'route'
-  const environments: Environments = data.data.reduce<Environments>(
-    (newEnvironments, dataItem) => {
-      if (dataItem.type === 'environment') {
-        newEnvironments.push(dataItem.item);
-      }
-
-      return newEnvironments;
-    },
-    []
-  );
+  // extract all environments
+  const environments: Environments = listEnvironments(data);
 
   let findError: string;
 

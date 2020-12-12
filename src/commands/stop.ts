@@ -1,3 +1,4 @@
+import * as inquirer from 'inquirer';
 import { Command } from '@oclif/command';
 import { ProcessDescription } from 'pm2';
 import { commonFlags } from '../constants/command.constants';
@@ -21,8 +22,7 @@ export default class Stop extends Command {
   public static args = [
     {
       name: 'id',
-      description: "Running API pid or name (default: 'all')",
-      default: 'all',
+      description: 'Running API pid or name',
       required: false
     }
   ];
@@ -30,6 +30,23 @@ export default class Stop extends Command {
   public async run(): Promise<void> {
     const { args } = this.parse(Stop);
     let relistProcesses = false;
+
+    if(args.id === undefined) {
+      // Prompt for process
+      const processes: ProcessDescription[] = await ProcessManager.list();
+
+      if(processes.length === 0) {
+        this.error(Messages.CLI.NO_RUNNING_PROCESS);
+      }
+
+      const response: { process: string} = await inquirer.prompt([{
+        name: 'process',
+        message: 'select a process',
+        type: 'list',
+        choices: processes.map(e => ({ name: e.name || e.pid }))
+      }]);
+      args.id = response.process;
+    }
 
     try {
       // typing is wrong, delete() returns an array
