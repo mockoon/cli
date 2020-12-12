@@ -15,16 +15,6 @@ describe('Start command', () => {
 
   test
     .stderr()
-    .command(['start', '--data', sampleDataPath])
-    .catch((context) => {
-      expect(context.message).to.contain(
-        '--index or --name is missing, you must provide one of them'
-      );
-    })
-    .it('should fail when index or name is not provided');
-
-  test
-    .stderr()
     .command(['start', '--data', sampleDataPath, '-i', '0', '--port', '999999'])
     .catch((context) => {
       expect(context.message).to.contain('Port "999999" is invalid');

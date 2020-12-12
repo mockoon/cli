@@ -36,7 +36,8 @@ export default class Stop extends Command {
       const processes: ProcessDescription[] = await ProcessManager.list();
 
       if(processes.length === 0) {
-        this.error(Messages.CLI.NO_RUNNING_PROCESS);
+        this.log(Messages.CLI.NO_RUNNING_PROCESS);
+        return;
       }
 
       const response: { process: string} = await inquirer.prompt([{

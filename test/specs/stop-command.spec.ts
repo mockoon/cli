@@ -71,7 +71,7 @@ describe('Stop all running mocks by default', () => {
       );
     });
 
-  stopProcesses(null, 2, ['mock1', 'mock2']);
+  stopProcesses('all', 2, ['mock1', 'mock2']);
 });
 
 describe('Stop when no mock is running and no arg', () => {
