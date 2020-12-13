@@ -18,6 +18,7 @@ export default class Start extends Command {
 
   public static examples = [
     '$ mockoon start --data ~/export-data.json --index 0',
+    '$ mockoon start --data https://file-server/export-data.json --index 0',
     '$ mockoon start --data ~/export-data.json --name "Mock environment"',
     '$ mockoon start --data ~/export-data.json --name "Mock environment" --pname "proc1"'
   ];
@@ -26,7 +27,7 @@ export default class Start extends Command {
     ...commonFlags,
     data: flags.string({
       char: 'd',
-      description: 'Path to your Mockoon data export file',
+      description: 'Path or URL to your Mockoon data export file',
       required: true
     }),
     name: flags.string({

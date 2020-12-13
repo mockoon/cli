@@ -102,7 +102,7 @@ USAGE
   $ mockoon start
 
 OPTIONS
-  -d, --data=data    (required) Path to your Mockoon data export file
+  -d, --data=data    (required) Path or URL to your Mockoon data export file
   -h, --help         show CLI help
   -i, --index=index  Environment's index in the data file
   -n, --name=name    Environment name in the data file
@@ -111,6 +111,7 @@ OPTIONS
 
 EXAMPLES
   $ mockoon start --data ~/export-data.json --index 0
+  $ mockoon start --data https://file-server/export-data.json --index 0
   $ mockoon start --data ~/export-data.json --name "Mock environment"
   $ mockoon start --data ~/export-data.json --name "Mock environment" --pname "proc1"
 ```
