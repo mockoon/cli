@@ -10,6 +10,7 @@ import { readFile as readJSONFile } from 'jsonfile';
 import * as mkdirp from 'mkdirp';
 import { join } from 'path';
 import { ProcessDescription } from 'pm2';
+import axios from 'axios';
 import { format } from 'util';
 import { Config } from '../config';
 import { Messages } from '../constants/messages.constants';
@@ -20,8 +21,16 @@ import { transformEnvironmentName } from './utils';
  *
  * @param filePath
  */
-export const parseDataFile = async <T>(filePath: string): Promise<T> =>
-  await readJSONFile(filePath, 'utf-8');
+export const parseDataFile = async <T>(filePath: string): Promise<T> => {
+  if(filePath.indexOf('http') !== 0) {
+    return readJSONFile(filePath, 'utf-8');
+  }
+
+  let { data } = await axios.get(filePath, { timeout: 5000 });
+  data = (typeof data === 'string') ? JSON.parse(data) : data;
+
+  return data;
+};
 
 /**
  * Check if an environment can be run by the CLI and

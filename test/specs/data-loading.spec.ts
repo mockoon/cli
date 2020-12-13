@@ -14,6 +14,40 @@ describe('Data loading', () => {
 
   test
     .stderr()
+    .command(['start', '--data', 'https://example.org', '-i', '0'])
+    .catch((context) => {
+      expect(context.message).to.contain('Unexpected token < in JSON at position');
+    })
+    .it('should fail when the response is no valid JSON');
+
+  test
+    .stderr()
+    .command(['start', '--data', 'https://malformed url', '-i', '0'])
+    .catch((context) => {
+      const contains = context.message.indexOf('getaddrinfo ENOTFOUND') >= 0 || context.message.indexOf('getaddrinfo EAI_AGAIN') >= 0;
+      expect(contains).to.eql(true);
+    })
+    .it('should fail when the URL is invalid');
+
+  test
+    .stderr()
+    .command(['start', '--data', 'https://not-existing-url', '-i', '0'])
+    .catch((context) => {
+      const contains = context.message.indexOf('getaddrinfo ENOTFOUND') >= 0 || context.message.indexOf('getaddrinfo EAI_AGAIN') >= 0;
+      expect(contains).to.eql(true);
+    })
+    .it('should fail when the address cannot be found');
+
+  test
+    .stderr()
+    .command(['start', '--data', 'https://www.google.com:81', '-i', '0'])
+    .catch((context) => {
+      expect(context.message).to.contain('timeout');
+    })
+    .it('should fail when there is no response');
+
+  test
+    .stderr()
     .command(['start', '--data', './test/data/broken-data.json', '-i', '0'])
     .catch((context) => {
       expect(context.message).to.contain(
