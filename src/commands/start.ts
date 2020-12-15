@@ -67,7 +67,7 @@ export default class Start extends Command {
 
       const response: { environment: string} = await inquirer.prompt([{
         name: 'environment',
-        message: 'select an environment',
+        message: 'Please select an environment',
         type: 'list',
         choices: environments.map(e => ({ name: e.name }))
       }]);
