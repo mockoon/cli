@@ -38,6 +38,8 @@ export default class Stop extends Command {
       if(processes.length === 0) {
         this.log(Messages.CLI.NO_RUNNING_PROCESS);
 
+        ProcessManager.disconnect();
+        
         return;
       }
 
