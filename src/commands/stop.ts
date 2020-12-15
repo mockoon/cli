@@ -39,7 +39,7 @@ export default class Stop extends Command {
         this.log(Messages.CLI.NO_RUNNING_PROCESS);
 
         ProcessManager.disconnect();
-        
+
         return;
       }
 
