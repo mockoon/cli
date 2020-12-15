@@ -43,7 +43,7 @@ export default class Stop extends Command {
 
       const response: { process: string} = await inquirer.prompt([{
         name: 'process',
-        message: 'select a process',
+        message: 'Please select a process',
         type: 'list',
         choices: processes.map(e => ({ name: e.name || e.pid }))
       }]);
