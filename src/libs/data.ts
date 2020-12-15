@@ -22,12 +22,19 @@ import { transformEnvironmentName } from './utils';
  * @param filePath
  */
 export const parseDataFile = async <T>(filePath: string): Promise<T> => {
+  let data;
+
   if(filePath.indexOf('http') !== 0) {
-    return readJSONFile(filePath, 'utf-8');
+    data = await readJSONFile(filePath, 'utf-8');
+  } else {
+    const { data: responseData } = await axios.get(filePath, { timeout: 5000 });
+    data = (typeof responseData === 'string') ? JSON.parse(responseData) : responseData;
   }
 
-  let { data } = await axios.get(filePath, { timeout: 5000 });
-  data = (typeof data === 'string') ? JSON.parse(data) : data;
+  // verify export file new format
+  if (!data.source || !data.data) {
+    throw new Error(Messages.CLI.DATA_FILE_TOO_OLD_ERROR);
+  }
 
   return data;
 };
@@ -86,11 +93,6 @@ const getEnvironment = (
   data: Export,
   options: { name?: string; index?: number }
 ): Environment => {
-  // verify export file new format
-  if (!data.source || !data.data) {
-    throw new Error(Messages.CLI.DATA_FILE_TOO_OLD_ERROR);
-  }
-
   // extract all environments
   const environments: Environments = listEnvironments(data);
 
@@ -133,11 +135,12 @@ const getEnvironment = (
  * @param options
  */
 export const prepareData = async (
-  filePath: string,
+  fileOrPath: Export | string,
   options: { name?: string; index?: number; port?: number; pname?: string }
 ): Promise<{ name: string; port: number; dataFile: string }> => {
   let environment: Environment = getEnvironment(
-    await parseDataFile<Export>(filePath),
+    // if we receive a path, we load the data, otherwise we already have the data
+    typeof fileOrPath === 'string' ? await parseDataFile<Export>(fileOrPath) : fileOrPath,
     options
   );
 

@@ -57,9 +57,11 @@ export default class Start extends Command {
 
     let environmentInfo: { name: any; port: any; dataFile: string };
 
+    const data = await parseDataFile<Export>(userFlags.data);
+
     if (userFlags.index === undefined && !userFlags.name) {
       // Prompt for environment
-      const environments = await parseDataFile<Export>(userFlags.data).then(data => listEnvironments(data));
+      const environments = await listEnvironments(data);
 
       if(environments.length === 0) {
         this.error(Messages.CLI.ENVIRONMENT_NOT_AVAILABLE_ERROR);
@@ -75,7 +77,7 @@ export default class Start extends Command {
     }
 
     try {
-      environmentInfo = await prepareData(userFlags.data, {
+      environmentInfo = await prepareData(data, {
         index: userFlags.index,
         name: userFlags.name,
         port: userFlags.port,
