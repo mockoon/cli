@@ -24,11 +24,14 @@ import { transformEnvironmentName } from './utils';
 export const parseDataFile = async <T>(filePath: string): Promise<T> => {
   let data;
 
-  if(filePath.indexOf('http') !== 0) {
+  if (filePath.indexOf('http') !== 0) {
     data = await readJSONFile(filePath, 'utf-8');
   } else {
     const { data: responseData } = await axios.get(filePath, { timeout: 5000 });
-    data = (typeof responseData === 'string') ? JSON.parse(responseData) : responseData;
+    data =
+      typeof responseData === 'string'
+        ? JSON.parse(responseData)
+        : responseData;
   }
 
   // verify export file new format
