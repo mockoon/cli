@@ -9,4 +9,4 @@ RUN chown -R mockoon mockoon-runner.sh
 USER mockoon
 
 ENTRYPOINT ["sh", "mockoon-runner.sh"]
-# Usage: docker run --mount type=bind,source="$(pwd)"/dataFile.json,target=/data,readonly mockoon-test -d data -n <env_name>
+# Usage: docker run --mount type=bind,source="$(pwd)"/dataFile.json,target=/data,readonly -p <port>:<port> mockoon-test -d data -n <env_name>
