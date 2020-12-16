@@ -1,4 +1,3 @@
-import { Export } from '@mockoon/commons';
 import { Command, flags } from '@oclif/command';
 import * as inquirer from 'inquirer';
 import { join, resolve } from 'path';
@@ -7,7 +6,7 @@ import { format } from 'util';
 import { Config } from '../config';
 import { commonFlags } from '../constants/command.constants';
 import { Messages } from '../constants/messages.constants';
-import { listEnvironments, parseDataFile, prepareData } from '../libs/data';
+import { parseDataFile, prepareData } from '../libs/data';
 import {
   ConfigProcess,
   ProcessListManager,
@@ -19,6 +18,7 @@ export default class Start extends Command {
   public static description = 'Start a mock API';
 
   public static examples = [
+    '$ mockoon start --data ~/export-data.json',
     '$ mockoon start --data ~/export-data.json --index 0',
     '$ mockoon start --data https://file-server/export-data.json --index 0',
     '$ mockoon start --data ~/export-data.json --name "Mock environment"',
@@ -57,27 +57,25 @@ export default class Start extends Command {
 
     let environmentInfo: { name: any; port: any; dataFile: string };
 
-    const data = await parseDataFile<Export>(userFlags.data);
+    const environments = await parseDataFile(userFlags.data);
 
     if (userFlags.index === undefined && !userFlags.name) {
-      // Prompt for environment
-      const environments = await listEnvironments(data);
+      const response: { environment: string } = await inquirer.prompt([
+        {
+          name: 'environment',
+          message: 'Please select an environment',
+          type: 'list',
+          choices: environments.map((environment) => ({
+            name: environment.name
+          }))
+        }
+      ]);
 
-      if(environments.length === 0) {
-        this.error(Messages.CLI.ENVIRONMENT_NOT_AVAILABLE_ERROR);
-      }
-
-      const response: { environment: string} = await inquirer.prompt([{
-        name: 'environment',
-        message: 'Please select an environment',
-        type: 'list',
-        choices: environments.map(e => ({ name: e.name }))
-      }]);
       userFlags.name = response.environment;
     }
 
     try {
-      environmentInfo = await prepareData(data, {
+      environmentInfo = await prepareData(environments, {
         index: userFlags.index,
         name: userFlags.name,
         port: userFlags.port,

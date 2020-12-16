@@ -110,6 +110,7 @@ OPTIONS
   -N, --pname=pname    Override process name
 
 EXAMPLES
+  $ mockoon start --data ~/export-data.json
   $ mockoon start --data ~/export-data.json --index 0
   $ mockoon start --data https://file-server/export-data.json --index 0
   $ mockoon start --data ~/export-data.json --name "Mock environment"
@@ -159,12 +160,13 @@ USAGE
   $ mockoon stop [ID]
 
 ARGUMENTS
-  ID  Running API pid or name (default: 'all')
+  ID  Running API pid or name
 
 OPTIONS
   -h, --help  show CLI help
 
 EXAMPLE
+  $ mockoon stop
   $ mockoon stop 0
   $ mockoon stop "name"
   $ mockoon stop "all"

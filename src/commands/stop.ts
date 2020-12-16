@@ -1,5 +1,5 @@
-import * as inquirer from 'inquirer';
 import { Command } from '@oclif/command';
+import * as inquirer from 'inquirer';
 import { ProcessDescription } from 'pm2';
 import { commonFlags } from '../constants/command.constants';
 import { Messages } from '../constants/messages.constants';
@@ -10,6 +10,7 @@ import { logProcesses } from '../libs/utils';
 export default class Stop extends Command {
   public static description = 'Stop a mock API';
   public static examples = [
+    '$ mockoon stop',
     '$ mockoon stop 0',
     '$ mockoon stop "name"',
     '$ mockoon stop "all"'
@@ -31,11 +32,11 @@ export default class Stop extends Command {
     const { args } = this.parse(Stop);
     let relistProcesses = false;
 
-    if(args.id === undefined) {
+    if (args.id === undefined) {
       // Prompt for process
       const processes: ProcessDescription[] = await ProcessManager.list();
 
-      if(processes.length === 0) {
+      if (processes.length === 0) {
         this.log(Messages.CLI.NO_RUNNING_PROCESS);
 
         ProcessManager.disconnect();
@@ -43,12 +44,16 @@ export default class Stop extends Command {
         return;
       }
 
-      const response: { process: string} = await inquirer.prompt([{
-        name: 'process',
-        message: 'Please select a process',
-        type: 'list',
-        choices: processes.map(e => ({ name: e.name || e.pid }))
-      }]);
+      const response: { process: string } = await inquirer.prompt([
+        {
+          name: 'process',
+          message: 'Please select a process',
+          type: 'list',
+          choices: processes.map((process) => ({
+            name: process.name || process.pid
+          }))
+        }
+      ]);
       args.id = response.process;
     }
 

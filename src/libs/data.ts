@@ -5,12 +5,12 @@ import {
   HighestMigrationId,
   Migrations
 } from '@mockoon/commons';
+import axios from 'axios';
 import { promises as fs } from 'fs';
 import { readFile as readJSONFile } from 'jsonfile';
 import * as mkdirp from 'mkdirp';
 import { join } from 'path';
 import { ProcessDescription } from 'pm2';
-import axios from 'axios';
 import { format } from 'util';
 import { Config } from '../config';
 import { Messages } from '../constants/messages.constants';
@@ -21,25 +21,44 @@ import { transformEnvironmentName } from './utils';
  *
  * @param filePath
  */
-export const parseDataFile = async <T>(filePath: string): Promise<T> => {
-  let data;
+export const parseDataFile = async (
+  filePath: string
+): Promise<Environments> => {
+  let dataExport: Export;
 
   if (filePath.indexOf('http') !== 0) {
-    data = await readJSONFile(filePath, 'utf-8');
+    dataExport = await readJSONFile(filePath, 'utf-8');
   } else {
     const { data: responseData } = await axios.get(filePath, { timeout: 5000 });
-    data =
+
+    dataExport =
       typeof responseData === 'string'
         ? JSON.parse(responseData)
         : responseData;
   }
 
   // verify export file new format
-  if (!data.source || !data.data) {
+  if (!dataExport.source || !dataExport.data) {
     throw new Error(Messages.CLI.DATA_FILE_TOO_OLD_ERROR);
   }
 
-  return data;
+  // Extract all environments, eventually filter items of type 'route'
+  const environments = dataExport.data.reduce<Environments>(
+    (newEnvironments, dataItem) => {
+      if (dataItem.type === 'environment') {
+        newEnvironments.push(dataItem.item);
+      }
+
+      return newEnvironments;
+    },
+    []
+  );
+
+  if (environments.length === 0) {
+    throw new Error(Messages.CLI.ENVIRONMENT_NOT_AVAILABLE_ERROR);
+  }
+
+  return environments;
 };
 
 /**
@@ -70,22 +89,6 @@ const migrateEnvironment = (environment: Environment) => {
 };
 
 /**
- * List all environments of a data file. Extract all environments, eventually filter items of type 'route'
- *
- * @param data
- */
-export const listEnvironments = (data: Export): Environments => data.data.reduce<Environments>(
-  (newEnvironments, dataItem) => {
-    if (dataItem.type === 'environment') {
-      newEnvironments.push(dataItem.item);
-    }
-
-    return newEnvironments;
-  },
-  []
-);
-
-/**
  * Check if data file is in the new format (with data and source)
  * and return the environment by index or name
  *
@@ -93,12 +96,9 @@ export const listEnvironments = (data: Export): Environments => data.data.reduce
  * @param options
  */
 const getEnvironment = (
-  data: Export,
+  environments: Environments,
   options: { name?: string; index?: number }
 ): Environment => {
-  // extract all environments
-  const environments: Environments = listEnvironments(data);
-
   let findError: string;
 
   // find environment by index
@@ -134,16 +134,15 @@ const getEnvironment = (
  * Load the data file, find and migrate the environment
  * copy the environment to a new temporary file.
  *
- * @param filePath - path to the data file
+ * @param environmentsOrFilePath - path to the data file or export data
  * @param options
  */
 export const prepareData = async (
-  fileOrPath: Export | string,
+  environmentsOrFilePath: Environments,
   options: { name?: string; index?: number; port?: number; pname?: string }
 ): Promise<{ name: string; port: number; dataFile: string }> => {
   let environment: Environment = getEnvironment(
-    // if we receive a path, we load the data, otherwise we already have the data
-    typeof fileOrPath === 'string' ? await parseDataFile<Export>(fileOrPath) : fileOrPath,
+    environmentsOrFilePath,
     options
   );
 

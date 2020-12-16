@@ -16,7 +16,9 @@ describe('Data loading', () => {
     .stderr()
     .command(['start', '--data', 'https://example.org', '-i', '0'])
     .catch((context) => {
-      expect(context.message).to.contain('Unexpected token < in JSON at position');
+      expect(context.message).to.contain(
+        'Unexpected token < in JSON at position'
+      );
     })
     .it('should fail when the response is no valid JSON');
 
@@ -24,7 +26,9 @@ describe('Data loading', () => {
     .stderr()
     .command(['start', '--data', 'https://malformed url', '-i', '0'])
     .catch((context) => {
-      const contains = context.message.indexOf('getaddrinfo ENOTFOUND') >= 0 || context.message.indexOf('getaddrinfo EAI_AGAIN') >= 0;
+      const contains =
+        context.message.indexOf('getaddrinfo ENOTFOUND') >= 0 ||
+        context.message.indexOf('getaddrinfo EAI_AGAIN') >= 0;
       expect(contains).to.eql(true);
     })
     .it('should fail when the URL is invalid');
@@ -33,7 +37,9 @@ describe('Data loading', () => {
     .stderr()
     .command(['start', '--data', 'https://not-existing-url', '-i', '0'])
     .catch((context) => {
-      const contains = context.message.indexOf('getaddrinfo ENOTFOUND') >= 0 || context.message.indexOf('getaddrinfo EAI_AGAIN') >= 0;
+      const contains =
+        context.message.indexOf('getaddrinfo ENOTFOUND') >= 0 ||
+        context.message.indexOf('getaddrinfo EAI_AGAIN') >= 0;
       expect(contains).to.eql(true);
     })
     .it('should fail when the address cannot be found');
@@ -55,6 +61,16 @@ describe('Data loading', () => {
       );
     })
     .it('should fail when JSON data is invalid');
+
+  test
+    .stderr()
+    .command(['start', '--data', './test/data/empty-data.json', '-i', '0'])
+    .catch((context) => {
+      expect(context.message).to.contain(
+        'No environments exist in specified file'
+      );
+    })
+    .it('should fail when file contains no environment');
 
   test
     .stderr()
