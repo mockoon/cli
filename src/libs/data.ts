@@ -22,12 +22,22 @@ import { transformEnvironmentName } from './utils';
  * @param filePath
  */
 export const parseDataFile = async <T>(filePath: string): Promise<T> => {
-  if(filePath.indexOf('http') !== 0) {
-    return readJSONFile(filePath, 'utf-8');
+  let data;
+
+  if (filePath.indexOf('http') !== 0) {
+    data = await readJSONFile(filePath, 'utf-8');
+  } else {
+    const { data: responseData } = await axios.get(filePath, { timeout: 5000 });
+    data =
+      typeof responseData === 'string'
+        ? JSON.parse(responseData)
+        : responseData;
   }
 
-  let { data } = await axios.get(filePath, { timeout: 5000 });
-  data = (typeof data === 'string') ? JSON.parse(data) : data;
+  // verify export file new format
+  if (!data.source || !data.data) {
+    throw new Error(Messages.CLI.DATA_FILE_TOO_OLD_ERROR);
+  }
 
   return data;
 };
@@ -60,6 +70,22 @@ const migrateEnvironment = (environment: Environment) => {
 };
 
 /**
+ * List all environments of a data file. Extract all environments, eventually filter items of type 'route'
+ *
+ * @param data
+ */
+export const listEnvironments = (data: Export): Environments => data.data.reduce<Environments>(
+  (newEnvironments, dataItem) => {
+    if (dataItem.type === 'environment') {
+      newEnvironments.push(dataItem.item);
+    }
+
+    return newEnvironments;
+  },
+  []
+);
+
+/**
  * Check if data file is in the new format (with data and source)
  * and return the environment by index or name
  *
@@ -70,22 +96,8 @@ const getEnvironment = (
   data: Export,
   options: { name?: string; index?: number }
 ): Environment => {
-  // verify export file new format
-  if (!data.source || !data.data) {
-    throw new Error(Messages.CLI.DATA_FILE_TOO_OLD_ERROR);
-  }
-
-  // extract all environments, eventually filter items of type 'route'
-  const environments: Environments = data.data.reduce<Environments>(
-    (newEnvironments, dataItem) => {
-      if (dataItem.type === 'environment') {
-        newEnvironments.push(dataItem.item);
-      }
-
-      return newEnvironments;
-    },
-    []
-  );
+  // extract all environments
+  const environments: Environments = listEnvironments(data);
 
   let findError: string;
 
@@ -126,11 +138,12 @@ const getEnvironment = (
  * @param options
  */
 export const prepareData = async (
-  filePath: string,
+  fileOrPath: Export | string,
   options: { name?: string; index?: number; port?: number; pname?: string }
 ): Promise<{ name: string; port: number; dataFile: string }> => {
   let environment: Environment = getEnvironment(
-    await parseDataFile<Export>(filePath),
+    // if we receive a path, we load the data, otherwise we already have the data
+    typeof fileOrPath === 'string' ? await parseDataFile<Export>(fileOrPath) : fileOrPath,
     options
   );
 

@@ -25,6 +25,7 @@ export const Messages = {
     ENVIRONMENT_NOT_FOUND_INDEX_ERROR: 'Environment not found at index "%d"',
     ENVIRONMENT_NOT_FOUND_NAME_ERROR:
       'Environment with name "%s" cannot be found',
+    ENVIRONMENT_NOT_AVAILABLE_ERROR: 'No environments exist in specified file',
     PORT_ALREADY_USED:
       'Port "%d" is already in use\nChange the environment\'s port in the data file or run start command with the "--port" flag',
     PORT_IS_NOT_VALID: 'Port "%d" is invalid'
