@@ -14,12 +14,13 @@
   "scripts": {
     "lint": "eslint -c .eslintrc.js --ext .js,.ts .",
     "test": "ts-mocha -p ./test/tsconfig.spec.json --timeout 10000 --forbid-only --file test/libs/setup.ts test/**/*.spec.ts",
-    "build": "rm -rf dist && tsc -p tsconfig.json"
+    "build": "rm -rf dist && tsc -p tsconfig.json && oclif-dev manifest"
   },
   "main": "./dist/index.js",
   "files": [
     "/dist",
-    "/bin"
+    "/bin",
+    "/oclif.manifest.json"
   ],
   "oclif": {
     "commands": "./dist/commands",

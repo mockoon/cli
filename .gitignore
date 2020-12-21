@@ -50,3 +50,5 @@ wip.md
 .env
 
 tsconfig.tsbuildinfo
+
+oclif.manifest.json
