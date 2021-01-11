@@ -6,44 +6,41 @@ on:
       - v*
 
 jobs:
-  #npm-publish:
-  #  name: Publish on NPM
-  #  runs-on: ubuntu-latest
-  #  timeout-minutes: 10
-  #
-  #  env:
-  #    NPM_TOKEN: ${{secrets.NPM_TOKEN}}
-  #
-  #  steps:
-  #    - uses: actions/checkout@v2
-  #    - name: Use Node.js 12.x
-  #      uses: actions/setup-node@v1
-  #      with:
-  #        node-version: "12.x"
-  #    - name: NPM install and build
-  #      run: |
-  #        npm ci
-  #        npm run build
-  #    - name: Check version
-  #      run: |
-  #        PACKAGE_VERSION=$(node -p -e "require('./package.json').version")
-  #        TAG_NAME=$(echo $GITHUB_REF | cut -d / -f 3)
-  #        if [[ "v${PACKAGE_VERSION}" != "$TAG_NAME" ]]; then exit 1; fi
-  #    - name: NPM publish
-  #      run: |
-  #        echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc
-  #        npm publish --access public
+  npm-publish:
+    name: Publish on NPM
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      NPM_TOKEN: ${{secrets.NPM_TOKEN}}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+      - name: NPM install and build
+        run: |
+          npm ci
+          npm run build
+      - name: Check version
+        run: |
+          PACKAGE_VERSION=$(node -p -e "require('./package.json').version")
+          TAG_NAME=$(echo $GITHUB_REF | cut -d / -f 3)
+          if [[ "v${PACKAGE_VERSION}" != "$TAG_NAME" ]]; then exit 1; fi
+      - name: NPM publish
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc
+          npm publish --access public
 
   docker:
     name: Push Docker image
-    #needs: npm-publish
+    needs: npm-publish
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
     steps:
-      #- name: Sleeping for 60s
-      #  run: |
-      #    sleep 60
       - uses: actions/checkout@v2
       - name: Extract app version
         id: app-version
