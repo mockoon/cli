@@ -1,10 +1,12 @@
+import { Environment } from '@mockoon/commons';
 import { Command, flags } from '@oclif/command';
-import * as inquirer from 'inquirer';
+import { readFile as readJSONFile } from 'jsonfile';
+import * as mkdirp from 'mkdirp';
 import { join, resolve } from 'path';
 import { Proc, ProcessDescription } from 'pm2';
 import { format } from 'util';
 import { Config } from '../config';
-import { commonFlags } from '../constants/command.constants';
+import { commonFlags, startFlags } from '../constants/command.constants';
 import { Messages } from '../constants/messages.constants';
 import { parseDataFile, prepareData } from '../libs/data';
 import {
@@ -12,7 +14,7 @@ import {
   ProcessListManager,
   ProcessManager
 } from '../libs/process-manager';
-import { portInUse, portIsValid } from '../libs/utils';
+import { portInUse, portIsValid, promptEnvironmentChoice } from '../libs/utils';
 
 export default class Start extends Command {
   public static description = 'Start a mock API';
@@ -27,70 +29,75 @@ export default class Start extends Command {
 
   public static flags = {
     ...commonFlags,
-    data: flags.string({
-      char: 'd',
-      description: 'Path or URL to your Mockoon data export file',
-      required: true
-    }),
-    name: flags.string({
-      char: 'n',
-      description: 'Environment name in the data file',
-      exclusive: ['index']
-    }),
-    index: flags.integer({
-      char: 'i',
-      description: "Environment's index in the data file",
-      exclusive: ['name']
-    }),
-    port: flags.integer({
-      char: 'p',
-      description: "Override environment's port"
-    }),
+    ...startFlags,
     pname: flags.string({
       char: 'N',
       description: 'Override the process name'
+    }),
+    /**
+     * /!\ Undocumented flag.
+     * Mostly for internal use when `start `command is called during
+     * a Docker image build.
+     *
+     * When using the `dockerize` command, file loading, validity checks,
+     * migrations, etc. are all performed, and the single environment is
+     * extracted in a separated file next to the generated Dockerfile.
+     * It's easier to directly provide this file to the `start` command run
+     * from the Dockerfile when building the Docker image rather than
+     * having the image build failing due to a failure in the `start` command.
+     */
+    container: flags.boolean({
+      char: 'c',
+      hidden: true
     })
   };
 
   public async run(): Promise<void> {
-    const { flags: userFlags } = this.parse(Start);
+    let { flags: userFlags } = this.parse(Start);
 
     let environmentInfo: { name: any; port: any; dataFile: string };
 
-    const environments = await parseDataFile(userFlags.data);
+    // We are in a container, env file is ready and relative to the Dockerfile
+    if (userFlags.container) {
+      const environment: Environment = await readJSONFile(
+        userFlags.data,
+        'utf-8'
+      );
 
-    if (userFlags.index === undefined && !userFlags.name) {
-      const response: { environment: string } = await inquirer.prompt([
-        {
-          name: 'environment',
-          message: 'Please select an environment',
-          type: 'list',
-          choices: environments.map((environment) => ({
-            name: environment.name
-          }))
-        }
-      ]);
+      environmentInfo = {
+        dataFile: userFlags.data,
+        name: environment.name,
+        port: environment.port
+      };
 
-      userFlags.name = response.environment;
-    }
+      await mkdirp(Config.dataPath);
+    } else {
+      const environments = await parseDataFile(userFlags.data);
 
-    try {
-      environmentInfo = await prepareData(environments, {
-        index: userFlags.index,
-        name: userFlags.name,
-        port: userFlags.port,
-        pname: userFlags.pname
-      });
-    } catch (error) {
-      this.error(error.message);
-    }
+      userFlags = await promptEnvironmentChoice(userFlags, environments);
 
-    if (!portIsValid(environmentInfo.port)) {
-      this.error(format(Messages.CLI.PORT_IS_NOT_VALID, environmentInfo.port));
-    }
+      try {
+        environmentInfo = await prepareData(environments, {
+          index: userFlags.index,
+          name: userFlags.name,
+          port: userFlags.port,
+          pname: userFlags.pname
+        });
+      } catch (error) {
+        this.error(error.message);
+      }
 
-    if (await portInUse(environmentInfo.port)) {
-      this.error(format(Messages.CLI.PORT_ALREADY_USED, environmentInfo.port));
+      if (!portIsValid(environmentInfo.port)) {
+        this.error(
+          format(Messages.CLI.PORT_IS_NOT_VALID, environmentInfo.port)
+        );
+      }
+
+      if (await portInUse(environmentInfo.port)) {
+        this.error(
+          format(Messages.CLI.PORT_ALREADY_USED, environmentInfo.port)
+        );
+      }
     }
 
     try {
@@ -138,11 +145,13 @@ export default class Start extends Command {
         process[0].pm2_env.pm_id,
         process[0].pm2_env.name
       );
+
       const configProcess: ConfigProcess = {
         name: environmentInfo.name,
         port: environmentInfo.port,
         pid: process[0].pm2_env.pm_id
       };
+
       await ProcessListManager.addProcess(configProcess);
     } catch (error) {
       this.error(error.message);

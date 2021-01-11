@@ -1,7 +1,6 @@
-export const DOCKER_TEMPLATE =
-`FROM node:14-alpine
+export const DOCKER_TEMPLATE = `FROM node:14-alpine
 
-RUN npm install -g @mockoon/cli
+RUN npm install -g @mockoon/cli@{{{version}}}
 COPY {{{filePath}}} ./data
 
 # Build runner script
@@ -15,5 +14,5 @@ USER mockoon
 
 EXPOSE {{{port}}}
 
-ENTRYPOINT sh mockoon-runner.sh -d data {{{attributes}}}
+ENTRYPOINT sh mockoon-runner.sh -d data -c
 # Usage: docker run -p <host_port>:<container_port> mockoon-test`;

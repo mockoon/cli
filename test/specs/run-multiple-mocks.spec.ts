@@ -23,7 +23,7 @@ describe('Run two mocks on the same port', () => {
     })
     .it('should fail starting second mock on same port');
 
-  stopProcesses('all', 1, ['mock1']);
+  stopProcesses('all', ['mock1']);
 });
 
 describe('Run two mocks on different port', () => {
@@ -53,7 +53,7 @@ describe('Run two mocks on different port', () => {
     expect(call2.data).to.contain('mock-content-2');
   });
 
-  stopProcesses('all', 2, ['mock1', 'mock2']);
+  stopProcesses('all', ['mock1', 'mock2']);
 });
 
 describe('Run two mocks with same name', () => {
@@ -96,5 +96,5 @@ describe('Run two mocks with same name', () => {
     }
   );
 
-  stopProcesses('all', 1, ['mock1']);
+  stopProcesses('all', ['mock1']);
 });

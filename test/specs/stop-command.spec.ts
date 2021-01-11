@@ -14,7 +14,7 @@ describe('Stop running mock by pid', () => {
       );
     });
 
-  stopProcesses('0', 1, ['mock1']);
+  stopProcesses('0', ['mock1']);
 });
 
 describe('Stop running mock by name', () => {
@@ -27,7 +27,7 @@ describe('Stop running mock by name', () => {
       );
     });
 
-  stopProcesses('mock1', 1, ['mock1']);
+  stopProcesses('mock1', ['mock1']);
 });
 
 describe('Stop all running mocks', () => {
@@ -49,7 +49,7 @@ describe('Stop all running mocks', () => {
       );
     });
 
-  stopProcesses('all', 2, ['mock1', 'mock2']);
+  stopProcesses('all', ['mock1', 'mock2']);
 });
 
 describe('Stop when no mock is running and no arg', () => {
@@ -104,5 +104,5 @@ describe('Stop with wrong arg and list', () => {
       );
     });
 
-  stopProcesses('0', 1, ['mock1']);
+  stopProcesses('0', ['mock1']);
 });

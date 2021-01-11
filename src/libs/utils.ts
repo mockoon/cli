@@ -1,4 +1,6 @@
+import { Environments } from '@mockoon/commons';
 import { cli } from 'cli-ux';
+import { prompt } from 'inquirer';
 import * as isPortReachable from 'is-port-reachable';
 import { ProcessDescription } from 'pm2';
 import * as prettyBytes from 'pretty-bytes';
@@ -67,3 +69,34 @@ export const portInUse = async (port: number): Promise<boolean> =>
  * @param port
  */
 export const portIsValid = (port: number): boolean => port >= 0 && port < 65536;
+
+/**
+ * Check if --index or --name flag are provided and
+ * prompt user to choose an environment
+ *
+ * @param flags
+ * @param environments
+ */
+export const promptEnvironmentChoice = async <
+  T extends { index: number | undefined; name: string | undefined }
+>(
+  flags: T,
+  environments: Environments
+): Promise<T> => {
+  if (flags.index === undefined && !flags.name) {
+    const response: { environment: string } = await prompt([
+      {
+        name: 'environment',
+        message: 'Please select an environment',
+        type: 'list',
+        choices: environments.map((environment) => ({
+          name: environment.name
+        }))
+      }
+    ]);
+
+    flags.name = response.environment;
+  }
+
+  return flags;
+};

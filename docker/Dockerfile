@@ -1,6 +1,8 @@
 FROM node:14-alpine
 
-RUN npm install -g @mockoon/cli
+ARG version=latest
+
+RUN npm install -g @mockoon/cli@$version
 COPY docker/runner.sh mockoon-runner.sh
 
 # Do not run as root.

@@ -4,7 +4,8 @@ import { expect } from 'chai';
 import { stopProcesses } from '../libs/helpers';
 
 const sampleDataPath = './test/data/sample-data.json';
-const sampleDataUrl = 'https://raw.githubusercontent.com/mockoon/cli/main/test/data/sample-data.json';
+const sampleDataUrl =
+  'https://raw.githubusercontent.com/mockoon/cli/main/test/data/sample-data.json';
 
 describe('Run single mock', () => {
   test
@@ -22,7 +23,7 @@ describe('Run single mock', () => {
     expect(result.data).to.contain('mock-content-1');
   });
 
-  stopProcesses('all', 1, ['mock1']);
+  stopProcesses('all', ['mock1']);
 });
 
 describe('Run single mock from URL', () => {
@@ -41,7 +42,7 @@ describe('Run single mock from URL', () => {
     expect(result.data).to.contain('mock-content-1');
   });
 
-  stopProcesses('all', 1, ['mock1']);
+  stopProcesses('all', ['mock1']);
 });
 
 describe('Run a single mock and override the process name', () => {
@@ -54,5 +55,5 @@ describe('Run a single mock and override the process name', () => {
       );
     });
 
-  stopProcesses('process123', 1, ['process123']);
+  stopProcesses('process123', ['process123']);
 });
