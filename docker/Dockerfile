@@ -3,7 +3,7 @@ FROM node:14-alpine
 ARG version=latest
 
 RUN npm install -g @mockoon/cli@$version
-COPY docker/runner.sh mockoon-runner.sh
+COPY runner.sh mockoon-runner.sh
 
 # Do not run as root.
 RUN adduser --shell /bin/sh --disabled-password --gecos "" mockoon
