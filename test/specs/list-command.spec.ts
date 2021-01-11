@@ -22,7 +22,7 @@ describe('List one process', () => {
       expect(context.stdout).to.contain('5001');
     });
 
-  stopProcesses('0', 1, ['mock1']);
+  stopProcesses('0', ['mock1']);
 });
 
 describe('List two processes', () => {
@@ -55,5 +55,5 @@ describe('List two processes', () => {
       expect(context.stdout).to.contain('5002');
     });
 
-  stopProcesses('all', 2, ['mock1', 'mock2']);
+  stopProcesses('all', ['mock1', 'mock2']);
 });

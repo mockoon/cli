@@ -23,7 +23,7 @@ describe('Get process info', () => {
       expect(context.stdout).to.contain('3000');
     });
 
-  stopProcesses('0', 1, ['mock1']);
+  stopProcesses('0', ['mock1']);
 });
 
 describe('Get first process info by default', () => {
@@ -45,7 +45,7 @@ describe('Get first process info by default', () => {
       expect(context.stdout).to.contain('3000');
     });
 
-  stopProcesses('0', 1, ['mock1']);
+  stopProcesses('0', ['mock1']);
 });
 
 describe('Get message if no process found', () => {

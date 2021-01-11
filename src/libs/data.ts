@@ -134,17 +134,15 @@ const getEnvironment = (
  * Load the data file, find and migrate the environment
  * copy the environment to a new temporary file.
  *
- * @param environmentsOrFilePath - path to the data file or export data
+ * @param environments - path to the data file or export data
  * @param options
  */
 export const prepareData = async (
-  environmentsOrFilePath: Environments,
-  options: { name?: string; index?: number; port?: number; pname?: string }
+  environments: Environments,
+  options: { name?: string; index?: number; port?: number; pname?: string },
+  dockerfileDir?: string
 ): Promise<{ name: string; port: number; dataFile: string }> => {
-  let environment: Environment = getEnvironment(
-    environmentsOrFilePath,
-    options
-  );
+  let environment: Environment = getEnvironment(environments, options);
 
   environment = migrateEnvironment(environment);
 
@@ -159,7 +157,13 @@ export const prepareData = async (
 
   await mkdirp(Config.dataPath);
 
-  const dataFile: string = join(Config.dataPath, `${environment.name}.json`);
+  let dataFile: string = join(Config.dataPath, `${environment.name}.json`);
+
+  // if we are building a Dockerfile, we want the data in the same folder
+  if (dockerfileDir) {
+    await mkdirp(dockerfileDir);
+    dataFile = `${dockerfileDir}/${environment.name}.json`;
+  }
 
   // save environment to data path
   await fs.writeFile(dataFile, JSON.stringify(environment));

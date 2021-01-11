@@ -1,7 +1,7 @@
 {
   "name": "@mockoon/cli",
   "description": "Mockoon's CLI. Deploy your mock APIs anywhere.",
-  "version": "0.1.0-beta.2",
+  "version": "0.1.0-beta.4",
   "author": {
     "name": "Guillaume Monnet",
     "email": "hi@255kb.dev",
@@ -13,8 +13,8 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint -c .eslintrc.js --ext .js,.ts .",
-    "test": "ts-mocha -p ./test/tsconfig.spec.json --timeout 10000 --forbid-only --file test/libs/setup.ts test/**/*.spec.ts",
-    "build": "rm -rf dist && tsc -p tsconfig.json && oclif-dev manifest"
+    "test": "ts-mocha -p ./tsconfig-build.json --timeout 10000 --forbid-only --file test/libs/setup.ts test/**/*.spec.ts",
+    "build": "rm -rf dist && tsc -p tsconfig-build.json && oclif-dev manifest"
   },
   "main": "./dist/index.js",
   "files": [
@@ -49,17 +49,16 @@
     "@oclif/command": "1.8.0",
     "@oclif/config": "1.17.0",
     "@oclif/plugin-help": "3.2.0",
-    "axios": "0.21.0",
+    "axios": "0.21.1",
     "cli-ux": "5.5.1",
     "inquirer": "7.3.3",
     "is-port-reachable": "3.0.0",
     "jsonfile": "6.1.0",
     "minimist": "1.2.5",
     "mkdirp": "1.0.4",
-    "pm2": "4.5.0",
+    "mustache": "4.1.0",
+    "pm2": "4.5.1",
     "pretty-bytes": "5.4.1",
-    "tail": "2.0.4",
-    "tail-file": "1.4.13",
     "tslib": "2.0.3",
     "winston": "3.3.3"
   },
@@ -72,8 +71,8 @@
     "@types/minimist": "1.2.1",
     "@types/mkdirp": "1.0.1",
     "@types/mocha": "8.2.0",
+    "@types/mustache": "4.1.0",
     "@types/node": "14.14.12",
-    "@types/tail": "2.0.0",
     "@typescript-eslint/eslint-plugin": "4.9.1",
     "@typescript-eslint/parser": "4.9.1",
     "chai": "4.2.0",

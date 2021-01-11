@@ -6,6 +6,9 @@ export const Messages = {
     RUNNING_PROCESSES: 'Running processes:',
     PROCESS_STOPPED: 'Process %d:%s stopped',
     PROCESS_STARTED: 'Mock started at http://localhost:%d (pid: %d, name: %s)',
+    DOCKERIZE_SUCCESS: 'Dockerfile was generated and saved to %s',
+    DOCKERIZE_BUILD_COMMAND:
+      'Run the following commands to build the image and run the container:\n    cd %s\n    docker build -t mockoon-cli-%s .\n    docker run -d -p %d:%d mockoon-cli-%s',
     PROCESS_NAME_USED_ERROR:
       'A process with the name "%s" is already running\nChange the environment\'s name in the data file or run start command with the "--pname" flag',
     PROCESS_START_LOG_ERROR: `Cannot start %s due to errors (see errors in ${join(
