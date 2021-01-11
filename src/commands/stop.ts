@@ -10,10 +10,10 @@ import { logProcesses } from '../libs/utils';
 export default class Stop extends Command {
   public static description = 'Stop a mock API';
   public static examples = [
-    '$ mockoon stop',
-    '$ mockoon stop 0',
-    '$ mockoon stop "name"',
-    '$ mockoon stop "all"'
+    '$ mockoon-cli stop',
+    '$ mockoon-cli stop 0',
+    '$ mockoon-cli stop "name"',
+    '$ mockoon-cli stop "all"'
   ];
 
   public static flags = {

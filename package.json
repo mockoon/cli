@@ -8,7 +8,7 @@
     "url": "https://255kb.dev/"
   },
   "bin": {
-    "mockoon": "./bin/run"
+    "mockoon-cli": "./bin/run"
   },
   "license": "MIT",
   "scripts": {
@@ -24,7 +24,7 @@
   ],
   "oclif": {
     "commands": "./dist/commands",
-    "bin": "mockoon",
+    "bin": "mockoon-cli",
     "plugins": [
       "@oclif/plugin-help"
     ]

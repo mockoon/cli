@@ -1,4 +1,4 @@
 #!/bin/bash
 
-mockoon start "$@"
+mockoon-cli start "$@"
 sleep infinity & wait $!

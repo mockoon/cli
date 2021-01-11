@@ -10,8 +10,8 @@ export default class Info extends Command {
   public static description = 'Display information for a running mock API';
 
   public static examples = [
-    '$ mockoon info 0',
-    '$ mockoon info "Mock_environment"'
+    '$ mockoon-cli info 0',
+    '$ mockoon-cli info "Mock_environment"'
   ];
 
   public static args = [

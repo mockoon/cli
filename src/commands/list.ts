@@ -8,7 +8,7 @@ import { logProcesses } from '../libs/utils';
 export default class List extends Command {
   public static description = 'List running mock APIs';
 
-  public static examples = ['$ mockoon list'];
+  public static examples = ['$ mockoon-cli list'];
   public static flags = {
     ...commonFlags
   };

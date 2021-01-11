@@ -26,12 +26,12 @@ The CLI supports the same features as the main application: [templating system](
 - [Export your mock to use in the CLI](#export-your-mock-to-use-in-the-cli)
 - [Compatibility](#compatibility)
 - [Commands](#commands)
-  - [`mockoon start`](#mockoon-start)
-  - [`mockoon list`](#mockoon-list)
-  - [`mockoon info [ID]`](#mockoon-info-id)
-  - [`mockoon stop [ID]`](#mockoon-stop-id)
-  - [`mockoon dockerize`](#mockoon-dockerize)
-  - [`mockoon help [COMMAND]`](#mockoon-help-command)
+  - [`mockoon-cli start`](#mockoon-cli-start)
+  - [`mockoon-cli list`](#mockoon-cli-list)
+  - [`mockoon-cli info [ID]`](#mockoon-cli-info-id)
+  - [`mockoon-cli stop [ID]`](#mockoon-cli-stop-id)
+  - [`mockoon-cli dockerize`](#mockoon-cli-dockerize)
+  - [`mockoon-cli help [COMMAND]`](#mockoon-cli-help-command)
 - [Docker](#docker)
   - [Using the generic Docker image](#using-the-generic-docker-image)
   - [Using the `dockerize` command](#using-the-dockerize-command)
@@ -52,7 +52,7 @@ $ npm install -g @mockoon/cli
 Usage: 
 
 ```sh-session
-$ mockoon COMMAND
+$ mockoon-cli COMMAND
 ```
 
 ## Export your mock to use in the CLI
@@ -71,10 +71,10 @@ To export your environment(s) to use them in the CLI, follow these steps:
   
 2. Choose a folder to save the JSON file.
    
-3. Use the [start command](#mockoon-start) below to launch your mock APIs with the CLI:
+3. Use the [start command](#mockoon-cli-start) below to launch your mock APIs with the CLI:
 
     ```sh-sessions
-    $ mockoon start --data ~/path/to/your-file.json -i 0
+    $ mockoon-cli start --data ~/path/to/your-file.json -i 0
     ```
 
 You will find more details in the [official documentation](https://mockoon.com/docs/latest/import-export-data/).
@@ -91,21 +91,21 @@ The CLI can import and migrate data from older versions of Mockoon. If you expor
 
 ## Commands
 
-- [`mockoon start`](#mockoon-start)
-- [`mockoon list`](#mockoon-list)
-- [`mockoon info [ID]`](#mockoon-info-id)
-- [`mockoon stop [ID]`](#mockoon-stop-id)
-- [`mockoon dockerize`](#mockoon-dockerize)
-- [`mockoon help [COMMAND]`](#mockoon-help-command)
+- [`mockoon-cli start`](#mockoon-cli-start)
+- [`mockoon-cli list`](#mockoon-cli-list)
+- [`mockoon-cli info [ID]`](#mockoon-cli-info-id)
+- [`mockoon-cli stop [ID]`](#mockoon-cli-stop-id)
+- [`mockoon-cli dockerize`](#mockoon-cli-dockerize)
+- [`mockoon-cli help [COMMAND]`](#mockoon-cli-help-command)
 
-### `mockoon start`
+### `mockoon-cli start`
 
 Starts a mock API from a Mockoon's export file environment. As an export file can contain multiple environments, you can indicate the one you want to run by specifying its index in the file or its name.
 The process will be created by default with the name and port of the Mockoon's environment. You can override these values by using the `--port` and `--pname` flags.
 
 ```
 USAGE
-  $ mockoon start
+  $ mockoon-cli start
 
 OPTIONS
   -d, --data=data    (required) Path or URL to your Mockoon data export file
@@ -116,35 +116,35 @@ OPTIONS
   -h, --help         show CLI help
 
 EXAMPLES
-  $ mockoon start --data ~/export-data.json
-  $ mockoon start --data ~/export-data.json --index 0
-  $ mockoon start --data https://file-server/export-data.json --index 0
-  $ mockoon start --data ~/export-data.json --name "Mock environment"
-  $ mockoon start --data ~/export-data.json --name "Mock environment" --pname "proc1"
+  $ mockoon-cli start --data ~/export-data.json
+  $ mockoon-cli start --data ~/export-data.json --index 0
+  $ mockoon-cli start --data https://file-server/export-data.json --index 0
+  $ mockoon-cli start --data ~/export-data.json --name "Mock environment"
+  $ mockoon-cli start --data ~/export-data.json --name "Mock environment" --pname "proc1"
 ```
 
-### `mockoon list`
+### `mockoon-cli list`
 
 Lists the running mock APIs and display some information: process name, pid, status, cpu, memory, port.
 
 ```
 USAGE
-  $ mockoon list
+  $ mockoon-cli list
 
 OPTIONS
   -h, --help  show CLI help
 
 EXAMPLE
-  $ mockoon list
+  $ mockoon-cli list
 ```
 
-### `mockoon info [ID]`
+### `mockoon-cli info [ID]`
 
 Returns some information about a running mock API: process name, pid, status, cpu, memory, port.
 
 ```
 USAGE
-  $ mockoon info [ID]
+  $ mockoon-cli info [ID]
 
 ARGUMENTS
   ID  Running API pid or name (default: 0)
@@ -153,17 +153,17 @@ OPTIONS
   -h, --help  show CLI help
 
 EXAMPLES
-  $ mockoon info 0
-  $ mockoon info "Mock_environment"
+  $ mockoon-cli info 0
+  $ mockoon-cli info "Mock_environment"
 ```
 
-### `mockoon stop [ID]`
+### `mockoon-cli stop [ID]`
 
 Stops one or more running processes. When 'all' is provided, all processes will be stopped.
 
 ```
 USAGE
-  $ mockoon stop [ID]
+  $ mockoon-cli stop [ID]
 
 ARGUMENTS
   ID  Running API pid or name
@@ -172,13 +172,13 @@ OPTIONS
   -h, --help  show CLI help
 
 EXAMPLE
-  $ mockoon stop
-  $ mockoon stop 0
-  $ mockoon stop "name"
-  $ mockoon stop "all"
+  $ mockoon-cli stop
+  $ mockoon-cli stop 0
+  $ mockoon-cli stop "name"
+  $ mockoon-cli stop "all"
 ```
 
-### `mockoon dockerize`
+### `mockoon-cli dockerize`
 
 Generates a Dockerfile used to build a self-contained image of a mock API. After building the image, no additional parameters will be needed when running the container. 
 This command takes similar flags as the [`start` command](#mockoon-start). 
@@ -189,7 +189,7 @@ For more information on how to build the image: [Using the dockerize command](#u
 
 ```
 USAGE
-  $ mockoon dockerize
+  $ mockoon-cli dockerize
 
 OPTIONS
   -d, --data=data    (required) Path or URL to your Mockoon data export file
@@ -200,19 +200,19 @@ OPTIONS
   -h, --help         show CLI help
 
 EXAMPLES
-  $ mockoon dockerize --data ~/export-data.json --output ./Dockerfile
-  $ mockoon dockerize --data ~/export-data.json --index 0 --output ./Dockerfile
-  $ mockoon dockerize --data https://file-server/export-data.json --index 0 --output ./Dockerfile
-  $ mockoon dockerize --data ~/export-data.json --name "Mock environment" --output ./Dockerfile
+  $ mockoon-cli dockerize --data ~/export-data.json --output ./Dockerfile
+  $ mockoon-cli dockerize --data ~/export-data.json --index 0 --output ./Dockerfile
+  $ mockoon-cli dockerize --data https://file-server/export-data.json --index 0 --output ./Dockerfile
+  $ mockoon-cli dockerize --data ~/export-data.json --name "Mock environment" --output ./Dockerfile
 ```
 
-### `mockoon help [COMMAND]`
+### `mockoon-cli help [COMMAND]`
 
 Returns information about a command.
 
 ```
 USAGE
-  $ mockoon help [COMMAND]
+  $ mockoon-cli help [COMMAND]
 
 ARGUMENTS
   COMMAND  command to show help for
@@ -227,23 +227,23 @@ OPTIONS
 
 A generic Docker image is published on the [Docker Hub Mockoon CLI repository](https://hub.docker.com/repository/docker/mockoon/cli). It uses `node:14-alpine` and installs the latest version of Mockoon CLI. 
 
-All of `mockoon start` flags (`--port`, `--index`, etc.) must be provided when running the container. 
+All of `mockoon-cli start` flags (`--port`, `--index`, etc.) must be provided when running the container. 
 
-To load the Mockoon data, you can either mount a local data file and pass `mockoon start` flags at the end of the command:
+To load the Mockoon data, you can either mount a local data file and pass `mockoon-cli start` flags at the end of the command:
 
 `docker run -d --mount type=bind,source=/home/your-data-file.json,target=/data,readonly -p 3000:3000 mockoon/cli:latest -d data -i 0 -p 3000`
 
-Or directly pass a URL to the `mockoon start` command, without mounting a local data file:
+Or directly pass a URL to the `mockoon-cli start` command, without mounting a local data file:
 
 `docker run -d -p 3000:3000 mockoon/cli:latest -d https://raw.githubusercontent.com/mockoon/mock-samples/main/samples/generate-mock-data.json -i 0 -p 3000`
 
 ### Using the `dockerize` command
 
-You can use the [`dockerize` command](#mockoon-dockerize) to generate a new Dockerfile that will allow you to build a self-contained image. Thus, no Mockoon CLI specific parameters will be needed when running the container.
+You can use the [`dockerize` command](#mockoon-cli-dockerize) to generate a new Dockerfile that will allow you to build a self-contained image. Thus, no Mockoon CLI specific parameters will be needed when running the container.
 
 - Run the `dockerize` command:
 
-  `mockoon dockerize --data ./sample-data.json --port 3000 --index 0 --output ./tmp/Dockerfile`
+  `mockoon-cli dockerize --data ./sample-data.json --port 3000 --index 0 --output ./tmp/Dockerfile`
 
 - navigate to the `tmp` folder, where the Dockerfile has been generated:
   

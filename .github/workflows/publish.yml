@@ -33,9 +33,10 @@ jobs:
         run: |
           echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> .npmrc
           npm publish --access public
+
   docker:
     name: Push Docker image
-    # needs: npm-publish
+    needs: npm-publish
     runs-on: ubuntu-latest
     timeout-minutes: 15
 

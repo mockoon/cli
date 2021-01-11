@@ -20,11 +20,11 @@ export default class Start extends Command {
   public static description = 'Start a mock API';
 
   public static examples = [
-    '$ mockoon start --data ~/export-data.json',
-    '$ mockoon start --data ~/export-data.json --index 0',
-    '$ mockoon start --data https://file-server/export-data.json --index 0',
-    '$ mockoon start --data ~/export-data.json --name "Mock environment"',
-    '$ mockoon start --data ~/export-data.json --name "Mock environment" --pname "proc1"'
+    '$ mockoon-cli start --data ~/export-data.json',
+    '$ mockoon-cli start --data ~/export-data.json --index 0',
+    '$ mockoon-cli start --data https://file-server/export-data.json --index 0',
+    '$ mockoon-cli start --data ~/export-data.json --name "Mock environment"',
+    '$ mockoon-cli start --data ~/export-data.json --name "Mock environment" --pname "proc1"'
   ];
 
   public static flags = {
