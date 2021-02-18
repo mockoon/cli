@@ -1,7 +1,7 @@
 {
   "name": "@mockoon/cli",
   "description": "Mockoon's CLI. Deploy your mock APIs anywhere.",
-  "version": "0.1.0-beta.5",
+  "version": "0.1.0-beta.6",
   "author": {
     "name": "Guillaume Monnet",
     "email": "hi@255kb.dev",
@@ -45,7 +45,7 @@
   "homepage": "https://github.com/mockoon/cli#readme",
   "funding": "https://mockoon.com/sponsor-us/",
   "dependencies": {
-    "@mockoon/commons": "1.0.3",
+    "@mockoon/commons": "1.2.1",
     "@oclif/command": "1.8.0",
     "@oclif/config": "1.17.0",
     "@oclif/plugin-help": "3.2.0",
@@ -57,7 +57,7 @@
     "minimist": "1.2.5",
     "mkdirp": "1.0.4",
     "mustache": "4.1.0",
-    "pm2": "4.5.1",
+    "pm2": "4.5.4",
     "pretty-bytes": "5.4.1",
     "tslib": "2.0.3",
     "winston": "3.3.3"
