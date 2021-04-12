@@ -1,9 +1,5 @@
-import {
-  Environment,
-  MockoonServer,
-  ServerErrorCodes,
-  Transaction
-} from '@mockoon/commons';
+import { Environment, ServerErrorCodes, Transaction } from '@mockoon/commons';
+import { MockoonServer } from '@mockoon/commons-server';
 import { readFileSync as readJSONFileSync } from 'jsonfile';
 import * as minimist from 'minimist';
 import { format } from 'util';
