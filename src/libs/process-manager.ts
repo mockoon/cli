@@ -3,7 +3,6 @@ import {
   writeFile,
   writeFileSync as jsonWriteFileSync
 } from 'jsonfile';
-import { sync as mkdirpSync } from 'mkdirp';
 import * as pm2 from 'pm2';
 import { Proc, ProcessDescription } from 'pm2';
 import { promisify } from 'util';
@@ -20,8 +19,6 @@ export type ConfigProcess = {
  */
 export const ProcessListManager = {
   addProcess: async (configProcess: ConfigProcess): Promise<void> => {
-    mkdirpSync(Config.configPath);
-
     const configData: ConfigProcess[] = ProcessListManager.getProcesses();
 
     if (

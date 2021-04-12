@@ -1,7 +1,6 @@
 import { Environment } from '@mockoon/commons';
 import { Command, flags } from '@oclif/command';
 import { readFile as readJSONFile } from 'jsonfile';
-import * as mkdirp from 'mkdirp';
 import { join, resolve } from 'path';
 import { Proc, ProcessDescription } from 'pm2';
 import { format } from 'util';
@@ -75,8 +74,6 @@ export default class Start extends Command {
         protocol: environment.https ? 'https' : 'http',
         port: environment.port
       };
-
-      await mkdirp(Config.dataPath);
     } else {
       const environments = await parseDataFile(userFlags.data);
 

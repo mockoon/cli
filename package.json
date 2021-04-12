@@ -1,7 +1,7 @@
 {
   "name": "@mockoon/cli",
   "description": "Mockoon's CLI. Deploy your mock APIs anywhere.",
-  "version": "0.1.0-beta.7",
+  "version": "0.1.0-beta.8",
   "author": {
     "name": "Guillaume Monnet",
     "email": "hi@255kb.dev",
@@ -24,6 +24,9 @@
   ],
   "oclif": {
     "commands": "./dist/commands",
+    "hooks": {
+      "init": "./dist/hooks/init"
+    },
     "bin": "mockoon-cli",
     "plugins": [
       "@oclif/plugin-help"

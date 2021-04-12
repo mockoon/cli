@@ -17,7 +17,7 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Mockoon version:**
+**Mockoon CLI version:**
 1.1.0, 1.0.0, etc
 
 **OS / OS version:**

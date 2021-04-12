@@ -160,8 +160,6 @@ export const prepareData = async (
     environment.port = options.port;
   }
 
-  await mkdirp(Config.dataPath);
-
   let dataFile: string = join(Config.dataPath, `${environment.name}.json`);
 
   // if we are building a Dockerfile, we want the data in the same folder
