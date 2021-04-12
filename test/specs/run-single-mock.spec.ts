@@ -57,3 +57,16 @@ describe('Run a single mock and override the process name', () => {
 
   stopProcesses('process123', ['process123']);
 });
+
+describe('Run an https mock and verify displayed information', () => {
+  test
+    .stdout()
+    .command(['start', '--data', sampleDataPath, '-i', '3'])
+    .it('should start mock on port 3000', (context) => {
+      expect(context.stdout).to.contain(
+        'Mock started at https://localhost:3000 (pid: 0, name: mockhttps)'
+      );
+    });
+
+  stopProcesses('mockhttps', ['mockhttps']);
+});

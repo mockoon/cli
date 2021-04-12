@@ -141,7 +141,12 @@ export const prepareData = async (
   environments: Environments,
   options: { name?: string; index?: number; port?: number; pname?: string },
   dockerfileDir?: string
-): Promise<{ name: string; port: number; dataFile: string }> => {
+): Promise<{
+  name: string;
+  protocol: string;
+  port: number;
+  dataFile: string;
+}> => {
   let environment: Environment = getEnvironment(environments, options);
 
   environment = migrateEnvironment(environment);
@@ -170,6 +175,7 @@ export const prepareData = async (
 
   return {
     name: environment.name,
+    protocol: environment.https ? 'https' : 'http',
     port: environment.port,
     dataFile
   };

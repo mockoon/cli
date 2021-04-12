@@ -55,7 +55,12 @@ export default class Start extends Command {
   public async run(): Promise<void> {
     let { flags: userFlags } = this.parse(Start);
 
-    let environmentInfo: { name: any; port: any; dataFile: string };
+    let environmentInfo: {
+      name: string;
+      protocol: string;
+      port: number;
+      dataFile: string;
+    };
 
     // We are in a container, env file is ready and relative to the Dockerfile
     if (userFlags.container) {
@@ -67,6 +72,7 @@ export default class Start extends Command {
       environmentInfo = {
         dataFile: userFlags.data,
         name: environment.name,
+        protocol: environment.https ? 'https' : 'http',
         port: environment.port
       };
 
@@ -141,6 +147,7 @@ export default class Start extends Command {
 
       this.log(
         Messages.CLI.PROCESS_STARTED,
+        environmentInfo.protocol,
         environmentInfo.port,
         process[0].pm2_env.pm_id,
         process[0].pm2_env.name
