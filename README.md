@@ -18,7 +18,7 @@
 Welcome to Mockoon's official CLI, a lightweight and fast NPM package to deploy your mock APIs anywhere. 
 Feed it with a Mockoon's [export file](https://mockoon.com/docs/latest/import-export-data/), and you are good to go. 
 
-The CLI supports the same features as the main application: [templating system](https://mockoon.com/docs/latest/templating/), [proxy mode](https://mockoon.com/docs/latest/proxy-mode/), [route response rules](https://mockoon.com/docs/latest/multiple-responses/), etc.
+The CLI supports the same features as the main application: [templating system](https://mockoon.com/docs/latest/templating/overview/), [proxy mode](https://mockoon.com/docs/latest/proxy-mode/), [route response rules](https://mockoon.com/docs/latest/route-responses/dynamic-rules/), etc.
 
 ![Mockoon CLI screenshot](./docs/screenshot.png)
 
