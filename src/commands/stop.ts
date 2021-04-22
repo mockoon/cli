@@ -31,19 +31,20 @@ export default class Stop extends Command {
   public async run(): Promise<void> {
     const { args } = this.parse(Stop);
     let relistProcesses = false;
+    let processesToStop: (string | number)[] = [];
 
+    const processes: ProcessDescription[] = await ProcessManager.list();
+
+    if (processes.length === 0) {
+      this.log(Messages.CLI.NO_RUNNING_PROCESS);
+
+      ProcessManager.disconnect();
+
+      return;
+    }
+
+    // prompt for process name or id
     if (args.id === undefined) {
-      // Prompt for process
-      const processes: ProcessDescription[] = await ProcessManager.list();
-
-      if (processes.length === 0) {
-        this.log(Messages.CLI.NO_RUNNING_PROCESS);
-
-        ProcessManager.disconnect();
-
-        return;
-      }
-
       const response: { process: string } = await inquirer.prompt([
         {
           name: 'process',
@@ -54,51 +55,69 @@ export default class Stop extends Command {
           }))
         }
       ]);
-      args.id = response.process;
+
+      processesToStop.push(response.process);
+    } else if (args.id === 'all') {
+      // list all mockoon's processes to stop
+      processesToStop = processes.reduce<(string | number)[]>(
+        (processes1, process) => {
+          const nameOrId = process.name || process.pm_id;
+
+          if (nameOrId !== undefined) {
+            processes1.push(nameOrId);
+          }
+
+          return processes1;
+        },
+        []
+      );
+    } else {
+      processesToStop.push(args.id);
     }
 
-    try {
-      // typing is wrong, delete() returns an array
-      const stoppedProcesses: ProcessDescription[] = (await ProcessManager.delete(
-        args.id
-      )) as ProcessDescription[];
+    for (const processToStop of processesToStop) {
+      try {
+        // typing is wrong, delete() returns an array
+        const stoppedProcesses: ProcessDescription[] = (await ProcessManager.delete(
+          processToStop
+        )) as ProcessDescription[];
+        // verify that something has been stopped
+        stoppedProcesses.forEach((stoppedProcess) => {
+          if (stoppedProcess !== undefined) {
+            this.log(
+              Messages.CLI.PROCESS_STOPPED,
+              stoppedProcess.pm_id,
+              stoppedProcess.name
+            );
 
-      // verify that something has been stopped
-      stoppedProcesses.forEach((stoppedProcess) => {
-        if (stoppedProcess !== undefined) {
-          this.log(
-            Messages.CLI.PROCESS_STOPPED,
-            stoppedProcess.pm_id,
-            stoppedProcess.name
-          );
-
-          ProcessListManager.deleteProcess(stoppedProcess.name);
+            ProcessListManager.deleteProcess(stoppedProcess.name);
+          }
+        });
+      } catch (error) {
+        if (error.message === 'process name not found' && args.id === 'all') {
+          // if 'all' was specified and no process was stopped, do not list and immediately exit
+          this.log(Messages.CLI.NO_RUNNING_PROCESS);
+        } else {
+          this.error(error.message, { exit: false });
+          relistProcesses = true;
         }
-      });
-    } catch (error) {
-      if (error.message === 'process name not found' && args.id === 'all') {
-        // if 'all' was specified and no process was stopped, do not list and immediately exit
-        this.log(Messages.CLI.NO_RUNNING_PROCESS);
-      } else {
-        this.error(error.message, { exit: false });
-        relistProcesses = true;
       }
     }
 
     try {
-      const processes: ProcessDescription[] = await ProcessManager.list();
+      const runningProcesses: ProcessDescription[] = await ProcessManager.list();
 
       if (relistProcesses) {
-        if (processes.length) {
+        if (runningProcesses.length) {
           this.log(Messages.CLI.RUNNING_PROCESSES);
-          logProcesses(processes);
+          logProcesses(runningProcesses);
         } else {
           this.log(Messages.CLI.NO_RUNNING_PROCESS);
         }
       }
 
       // always clean data files after a stop
-      await cleanDataFiles(processes);
+      await cleanDataFiles(runningProcesses);
     } catch (error) {
       this.error(error.message, { exit: false });
     }

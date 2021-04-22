@@ -7,6 +7,7 @@ import * as pm2 from 'pm2';
 import { Proc, ProcessDescription } from 'pm2';
 import { promisify } from 'util';
 import { Config } from '../config';
+import { filterProcesses } from './utils';
 
 export type ConfigProcess = {
   name?: string;
@@ -71,12 +72,13 @@ export const ProcessListManager = {
  * Promisify PM2 methods
  */
 export const ProcessManager = {
-  info: promisify(pm2.describe.bind(pm2)),
   list: async (): Promise<ProcessDescription[]> => {
     const processes = await promisify(pm2.list.bind(pm2))();
-    await ProcessListManager.updateProcesses(processes);
+    const filteredProcesses = filterProcesses(processes);
 
-    return processes;
+    await ProcessListManager.updateProcesses(filteredProcesses);
+
+    return filteredProcesses;
   },
   start: <(options: pm2.StartOptions) => Promise<Proc>>(
     promisify(pm2.start.bind(pm2))

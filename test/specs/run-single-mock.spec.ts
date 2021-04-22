@@ -13,7 +13,7 @@ describe('Run single mock', () => {
     .command(['start', '--data', sampleDataPath, '-i', '0'])
     .it('should start mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
-        'Mock started at http://localhost:3000 (pid: 0, name: mock1)'
+        'Mock started at http://localhost:3000 (pid: 0, name: mockoon-mock1)'
       );
     });
 
@@ -23,7 +23,7 @@ describe('Run single mock', () => {
     expect(result.data).to.contain('mock-content-1');
   });
 
-  stopProcesses('all', ['mock1']);
+  stopProcesses('all', ['mockoon-mock1']);
 });
 
 describe('Run single mock from URL', () => {
@@ -32,7 +32,7 @@ describe('Run single mock from URL', () => {
     .command(['start', '--data', sampleDataUrl, '-i', '0'])
     .it('should start mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
-        'Mock started at http://localhost:3000 (pid: 0, name: mock1)'
+        'Mock started at http://localhost:3000 (pid: 0, name: mockoon-mock1)'
       );
     });
 
@@ -42,7 +42,7 @@ describe('Run single mock from URL', () => {
     expect(result.data).to.contain('mock-content-1');
   });
 
-  stopProcesses('all', ['mock1']);
+  stopProcesses('all', ['mockoon-mock1']);
 });
 
 describe('Run a single mock and override the process name', () => {
@@ -51,11 +51,11 @@ describe('Run a single mock and override the process name', () => {
     .command(['start', '--data', sampleDataPath, '-i', '0', '-N', 'process123'])
     .it('should start mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
-        'Mock started at http://localhost:3000 (pid: 0, name: process123)'
+        'Mock started at http://localhost:3000 (pid: 0, name: mockoon-process123)'
       );
     });
 
-  stopProcesses('process123', ['process123']);
+  stopProcesses('mockoon-process123', ['mockoon-process123']);
 });
 
 describe('Run an https mock and verify displayed information', () => {
@@ -64,9 +64,9 @@ describe('Run an https mock and verify displayed information', () => {
     .command(['start', '--data', sampleDataPath, '-i', '3'])
     .it('should start mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
-        'Mock started at https://localhost:3000 (pid: 0, name: mockhttps)'
+        'Mock started at https://localhost:3000 (pid: 0, name: mockoon-mockhttps)'
       );
     });
 
-  stopProcesses('mockhttps', ['mockhttps']);
+  stopProcesses('mockoon-mockhttps', ['mockoon-mockhttps']);
 });

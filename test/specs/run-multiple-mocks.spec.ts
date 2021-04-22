@@ -11,7 +11,7 @@ describe('Run two mocks on the same port', () => {
     .command(['start', '--data', sampleDataPath, '-i', '0'])
     .it('should start first mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
-        'Mock started at http://localhost:3000 (pid: 0, name: mock1)'
+        'Mock started at http://localhost:3000 (pid: 0, name: mockoon-mock1)'
       );
     });
 
@@ -23,7 +23,7 @@ describe('Run two mocks on the same port', () => {
     })
     .it('should fail starting second mock on same port');
 
-  stopProcesses('all', ['mock1']);
+  stopProcesses('all', ['mockoon-mock1']);
 });
 
 describe('Run two mocks on different port', () => {
@@ -32,7 +32,7 @@ describe('Run two mocks on different port', () => {
     .command(['start', '--data', sampleDataPath, '-i', '0'])
     .it('should start first mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
-        'Mock started at http://localhost:3000 (pid: 0, name: mock1)'
+        'Mock started at http://localhost:3000 (pid: 0, name: mockoon-mock1)'
       );
     });
 
@@ -41,7 +41,7 @@ describe('Run two mocks on different port', () => {
     .command(['start', '--data', sampleDataPath, '-i', '1', '--port', '3001'])
     .it('should start second mock on port 3001', (context) => {
       expect(context.stdout).to.contain(
-        'Mock started at http://localhost:3001 (pid: 1, name: mock2)'
+        'Mock started at http://localhost:3001 (pid: 1, name: mockoon-mock2)'
       );
     });
 
@@ -53,7 +53,7 @@ describe('Run two mocks on different port', () => {
     expect(call2.data).to.contain('mock-content-2');
   });
 
-  stopProcesses('all', ['mock1', 'mock2']);
+  stopProcesses('all', ['mockoon-mock1', 'mockoon-mock2']);
 });
 
 describe('Run two mocks with same name', () => {
@@ -62,7 +62,7 @@ describe('Run two mocks with same name', () => {
     .command(['start', '--data', sampleDataPath, '-i', '0'])
     .it('should start first mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
-        'Mock started at http://localhost:3000 (pid: 0, name: mock1)'
+        'Mock started at http://localhost:3000 (pid: 0, name: mockoon-mock1)'
       );
     });
 
@@ -71,7 +71,7 @@ describe('Run two mocks with same name', () => {
     .command(['start', '--data', sampleDataPath, '-i', '2', '--port', '3001'])
     .catch((context) => {
       expect(context.message).to.contain(
-        'A process with the name "mock1" is already running'
+        'A process with the name "mockoon-mock1" is already running'
       );
     })
     .it('should fail starting second mock on port 3001 due to name error');
@@ -96,5 +96,5 @@ describe('Run two mocks with same name', () => {
     }
   );
 
-  stopProcesses('all', ['mock1']);
+  stopProcesses('all', ['mockoon-mock1']);
 });

@@ -10,11 +10,11 @@ describe('Stop running mock by pid', () => {
     .command(['start', '--data', sampleDataPath, '-i', '0'])
     .it('should start first mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
-        'Mock started at http://localhost:3000 (pid: 0, name: mock1)'
+        'Mock started at http://localhost:3000 (pid: 0, name: mockoon-mock1)'
       );
     });
 
-  stopProcesses('0', ['mock1']);
+  stopProcesses('0', ['mockoon-mock1']);
 });
 
 describe('Stop running mock by name', () => {
@@ -23,11 +23,11 @@ describe('Stop running mock by name', () => {
     .command(['start', '--data', sampleDataPath, '-i', '0'])
     .it('should start first mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
-        'Mock started at http://localhost:3000 (pid: 0, name: mock1)'
+        'Mock started at http://localhost:3000 (pid: 0, name: mockoon-mock1)'
       );
     });
 
-  stopProcesses('mock1', ['mock1']);
+  stopProcesses('mockoon-mock1', ['mockoon-mock1']);
 });
 
 describe('Stop all running mocks', () => {
@@ -36,7 +36,7 @@ describe('Stop all running mocks', () => {
     .command(['start', '--data', sampleDataPath, '-i', '0'])
     .it('should start first mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
-        'Mock started at http://localhost:3000 (pid: 0, name: mock1)'
+        'Mock started at http://localhost:3000 (pid: 0, name: mockoon-mock1)'
       );
     });
 
@@ -45,11 +45,11 @@ describe('Stop all running mocks', () => {
     .command(['start', '--data', sampleDataPath, '-i', '1', '--port', '3001'])
     .it('should start second mock on port 3001', (context) => {
       expect(context.stdout).to.contain(
-        'Mock started at http://localhost:3001 (pid: 1, name: mock2)'
+        'Mock started at http://localhost:3001 (pid: 1, name: mockoon-mock2)'
       );
     });
 
-  stopProcesses('all', ['mock1', 'mock2']);
+  stopProcesses('all', ['mockoon-mock1', 'mockoon-mock2']);
 });
 
 describe('Stop when no mock is running and no arg', () => {
@@ -67,7 +67,6 @@ describe('Stop when no mock is running and pid arg', () => {
     .stdout()
     .command(['stop', '0'])
     .it('should return error and "no process running" message', (context) => {
-      expect(context.stderr).to.contain('Process 0 not found');
       expect(context.stdout).to.contain('No process is running');
     });
 });
@@ -78,7 +77,6 @@ describe('Stop when no mock is running and name arg', () => {
     .stdout()
     .command(['stop', 'test'])
     .it('should return error and "no process running" message', (context) => {
-      expect(context.stderr).to.contain('process or namespace not found');
       expect(context.stdout).to.contain('No process is running');
     });
 });
@@ -89,7 +87,7 @@ describe('Stop with wrong arg and list', () => {
     .command(['start', '--data', sampleDataPath, '-i', '0'])
     .it('should start first mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
-        'Mock started at http://localhost:3000 (pid: 0, name: mock1)'
+        'Mock started at http://localhost:3000 (pid: 0, name: mockoon-mock1)'
       );
     });
 
@@ -100,9 +98,9 @@ describe('Stop with wrong arg and list', () => {
     .it('should return error and "no process running" message', (context) => {
       expect(context.stderr).to.contain('Process 99 not found');
       expect(context.stdout).to.contain(
-        'Running processes:\nName      Id   Status    Cpu    Memory    Port   \nmock1'
+        'Running processes:\nName          Id   Status    Cpu    Memory    Port   \nmockoon-mock1'
       );
     });
 
-  stopProcesses('0', ['mock1']);
+  stopProcesses('0', ['mockoon-mock1']);
 });
