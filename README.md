@@ -27,8 +27,7 @@ The CLI supports the same features as the main application: [templating system](
 - [Compatibility](#compatibility)
 - [Commands](#commands)
   - [`mockoon-cli start`](#mockoon-cli-start)
-  - [`mockoon-cli list`](#mockoon-cli-list)
-  - [`mockoon-cli info [ID]`](#mockoon-cli-info-id)
+  - [`mockoon-cli list [ID]`](#mockoon-cli-list-id)
   - [`mockoon-cli stop [ID]`](#mockoon-cli-stop-id)
   - [`mockoon-cli dockerize`](#mockoon-cli-dockerize)
   - [`mockoon-cli help [COMMAND]`](#mockoon-cli-help-command)
@@ -92,8 +91,7 @@ The CLI can import and migrate data from older versions of Mockoon. If you expor
 ## Commands
 
 - [`mockoon-cli start`](#mockoon-cli-start)
-- [`mockoon-cli list`](#mockoon-cli-list)
-- [`mockoon-cli info [ID]`](#mockoon-cli-info-id)
+- [`mockoon-cli list [ID]`](#mockoon-cli-list-id)
 - [`mockoon-cli stop [ID]`](#mockoon-cli-stop-id)
 - [`mockoon-cli dockerize`](#mockoon-cli-dockerize)
 - [`mockoon-cli help [COMMAND]`](#mockoon-cli-help-command)
@@ -123,38 +121,28 @@ EXAMPLES
   $ mockoon-cli start --data ~/export-data.json --name "Mock environment" --pname "proc1"
 ```
 
-### `mockoon-cli list`
+### `mockoon-cli list [ID]`
 
-Lists the running mock APIs and display some information: process name, pid, status, cpu, memory, port.
+_Command alias: `info`_
+
+Lists all the running mock APIs and display some information: process name, pid, status, cpu, memory, port.
+You can also get the same information for a specific mock API by providing its pid or name.
 
 ```
 USAGE
   $ mockoon-cli list
+
+ARGUMENTS
+  ID  Running API pid or name
 
 OPTIONS
   -h, --help  show CLI help
 
 EXAMPLE
   $ mockoon-cli list
-```
-
-### `mockoon-cli info [ID]`
-
-Returns some information about a running mock API: process name, pid, status, cpu, memory, port.
-
-```
-USAGE
-  $ mockoon-cli info [ID]
-
-ARGUMENTS
-  ID  Running API pid or name (default: 0)
-
-OPTIONS
-  -h, --help  show CLI help
-
-EXAMPLES
-  $ mockoon-cli info 0
-  $ mockoon-cli info "Mock_environment"
+  $ mockoon-cli info
+  $ mockoon-cli list 0
+  $ mockoon-cli list "Mock_environment"
 ```
 
 ### `mockoon-cli stop [ID]`
@@ -251,11 +239,11 @@ You can use the [`dockerize` command](#mockoon-cli-dockerize) to generate a new 
 
 - Build the image:
   
-  `docker build -t mockoon-cli-mock1 .`
+  `docker build -t mockoon-mock1 .`
 
 - Run the container:
   
-  `docker run -d -p <host_port>:3000 mockoon-cli-mock1`
+  `docker run -d -p <host_port>:3000 mockoon-mock1`
 
 ## Logs
 

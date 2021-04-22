@@ -4,6 +4,7 @@ import { prompt } from 'inquirer';
 import * as isPortReachable from 'is-port-reachable';
 import { ProcessDescription } from 'pm2';
 import * as prettyBytes from 'pretty-bytes';
+import { processPrefix } from '../constants/common.constants';
 import { ConfigProcess, ProcessListManager } from './process-manager';
 
 /**
@@ -54,7 +55,18 @@ export const logProcesses = (processes: ProcessDescription[]): void => {
  * @param environmentName
  */
 export const transformEnvironmentName = (environmentName: string): string =>
-  environmentName.trim().toLowerCase().replace(/ /g, '-') || 'mock';
+  `${processPrefix}${
+    environmentName.trim().toLowerCase().replace(/ /g, '-') || 'mock'
+  }`;
+
+/**
+ * Filter processes by name and keep only the one prefixed with 'mockoon-'
+ * @param processes
+ */
+export const filterProcesses = (
+  processes: ProcessDescription[]
+): ProcessDescription[] =>
+  processes.filter((process) => process.name?.includes(processPrefix));
 
 /**
  * Check if a port is already in use
