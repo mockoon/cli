@@ -1,6 +1,6 @@
 # Contributing to Mockoon-cli
 
-> **[Guidelines from Mockoon's main repository](https://github.com/mockoon/mockoon/blob/master/CONTRIBUTING.md) must be followed.**
+> **[Guidelines from Mockoon's main repository](https://github.com/mockoon/mockoon/blob/main/CONTRIBUTING.md) must be followed.**
 > **Specific guidelines below applies to this repository:**
 
 ## Application dependence
