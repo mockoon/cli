@@ -13,6 +13,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint -c .eslintrc.js --ext .js,.ts .",
+    "format": "prettier {src,test}/**/*.{ts,js,scss,html} --check",
     "test": "ts-mocha -p ./tsconfig-build.json --timeout 10000 --forbid-only --file test/libs/setup.ts test/**/*.spec.ts",
     "build": "rm -rf dist && tsc -p tsconfig-build.json && oclif-dev manifest"
   },
