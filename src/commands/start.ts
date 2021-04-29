@@ -8,10 +8,7 @@ import { Config } from '../config';
 import { commonFlags, startFlags } from '../constants/command.constants';
 import { Messages } from '../constants/messages.constants';
 import { parseDataFile, prepareData } from '../libs/data';
-import {
-  ProcessListManager,
-  ProcessManager
-} from '../libs/process-manager';
+import { ProcessListManager, ProcessManager } from '../libs/process-manager';
 import { portInUse, portIsValid, promptEnvironmentChoice } from '../libs/utils';
 
 interface EnvironmentInfo {
@@ -75,7 +72,6 @@ export default class Start extends Command {
     } finally {
       ProcessManager.disconnect();
     }
-
   }
 
   private async runEnvironment(environmentInfo: EnvironmentInfo) {
@@ -86,12 +82,15 @@ export default class Start extends Command {
       await this.handleProcessError(environmentInfo.name);
     }
 
-    await this.logStartedProcess(environmentInfo, process);
+    this.logStartedProcess(environmentInfo, process);
 
     await this.addProcessToProcessListManager(environmentInfo, process);
   }
 
-  private async addProcessToProcessListManager(environmentInfo: EnvironmentInfo, process: Proc) {
+  private async addProcessToProcessListManager(
+    environmentInfo: EnvironmentInfo,
+    process: Proc
+  ): Promise<void> {
     await ProcessListManager.addProcess({
       name: environmentInfo.name,
       port: environmentInfo.port,
@@ -99,7 +98,7 @@ export default class Start extends Command {
     });
   }
 
-  private async logStartedProcess(environmentInfo: EnvironmentInfo, process: Proc) {
+  private logStartedProcess(environmentInfo: EnvironmentInfo, process: Proc) {
     this.log(
       Messages.CLI.PROCESS_STARTED,
       environmentInfo.protocol,
@@ -128,9 +127,7 @@ export default class Start extends Command {
     // if process is errored we want to delete it
     await ProcessManager.delete(name);
 
-    this.error(
-      format(Messages.CLI.PROCESS_START_LOG_ERROR, name, name)
-    );
+    this.error(format(Messages.CLI.PROCESS_START_LOG_ERROR, name, name));
   }
 
   private async getEnvironmentInfoList(userFlags): Promise<EnvironmentInfo[]> {
@@ -142,7 +139,9 @@ export default class Start extends Command {
     return this.getEnvInfoListFromNonContainerFlag(userFlags);
   }
 
-  private async getEnvInfoListFromContainerFlag(userFlags): Promise<EnvironmentInfo[]> {
+  private async getEnvInfoListFromContainerFlag(
+    userFlags
+  ): Promise<EnvironmentInfo[]> {
     const environment: Environment = await readJSONFile(
       userFlags.data,
       'utf-8'
@@ -152,15 +151,19 @@ export default class Start extends Command {
       protocol = 'https';
     }
 
-    return [{
-      protocol,
-      dataFile: userFlags.data,
-      name: environment.name,
-      port: environment.port
-    }];
+    return [
+      {
+        protocol,
+        dataFile: userFlags.data,
+        name: environment.name,
+        port: environment.port
+      }
+    ];
   }
 
-  private async getEnvInfoListFromNonContainerFlag(userFlags): Promise<EnvironmentInfo[]> {
+  private async getEnvInfoListFromNonContainerFlag(
+    userFlags
+  ): Promise<EnvironmentInfo[]> {
     const environments = await parseDataFile(userFlags.data);
     if (userFlags.all) {
       return this.getEnvInfoFromEnvironments(environments);
@@ -169,7 +172,9 @@ export default class Start extends Command {
     return this.getEnvInfoFromUserChoice(userFlags, environments);
   }
 
-  private async getEnvInfoFromEnvironments(environments: Environments): Promise<EnvironmentInfo[]> {
+  private async getEnvInfoFromEnvironments(
+    environments: Environments
+  ): Promise<EnvironmentInfo[]> {
     const environmentInfoList: EnvironmentInfo[] = [];
     for (let envIndex = 0; envIndex < environments.length; envIndex++) {
       try {
@@ -187,7 +192,10 @@ export default class Start extends Command {
     return environmentInfoList;
   }
 
-  private async getEnvInfoFromUserChoice(userFlags, environments: Environments): Promise<EnvironmentInfo[]> {
+  private async getEnvInfoFromUserChoice(
+    userFlags,
+    environments: Environments
+  ): Promise<EnvironmentInfo[]> {
     userFlags = await promptEnvironmentChoice(userFlags, environments);
     let environmentInfo: EnvironmentInfo;
     try {
@@ -197,7 +205,6 @@ export default class Start extends Command {
         port: userFlags.port,
         pname: userFlags.pname
       });
-
     } catch (error) {
       this.error(error.message);
     }
@@ -207,24 +214,18 @@ export default class Start extends Command {
 
   private async validateName(name: string) {
     const runningProcesses: ProcessDescription[] = await ProcessManager.list();
-    const processNamesList = runningProcesses.map(process => process.name);
+    const processNamesList = runningProcesses.map((process) => process.name);
     if (processNamesList.includes(name)) {
-      this.error(
-        format(Messages.CLI.PROCESS_NAME_USED_ERROR, name)
-      );
+      this.error(format(Messages.CLI.PROCESS_NAME_USED_ERROR, name));
     }
   }
 
   private async validatePort(port: number) {
     if (!portIsValid(port)) {
-      this.error(
-        format(Messages.CLI.PORT_IS_NOT_VALID, port)
-      );
+      this.error(format(Messages.CLI.PORT_IS_NOT_VALID, port));
     }
     if (await portInUse(port)) {
-      this.error(
-        format(Messages.CLI.PORT_ALREADY_USED, port)
-      );
+      this.error(format(Messages.CLI.PORT_ALREADY_USED, port));
     }
   }
 }

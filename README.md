@@ -111,6 +111,7 @@ OPTIONS
   -n, --name=name    Environment name in the data file
   -p, --port=port    Override environment's port
   -N, --pname=pname    Override process name
+  -a, --all          Run all environments
   -h, --help         show CLI help
 
 EXAMPLES
@@ -119,6 +120,7 @@ EXAMPLES
   $ mockoon-cli start --data https://file-server/export-data.json --index 0
   $ mockoon-cli start --data ~/export-data.json --name "Mock environment"
   $ mockoon-cli start --data ~/export-data.json --name "Mock environment" --pname "proc1"
+  $ mockoon-cli start --data ~/export-data.json --all
 ```
 
 ### `mockoon-cli list [ID]`

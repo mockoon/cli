@@ -32,6 +32,8 @@ describe('Run all environments', () => {
   });
 
   stopProcesses('all', [
-    'mockoon-env0-mock0', 'mockoon-env1-mock1', 'mockoon-env2-mock2'
+    'mockoon-env0-mock0',
+    'mockoon-env1-mock1',
+    'mockoon-env2-mock2'
   ]);
 });
