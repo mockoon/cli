@@ -23,5 +23,10 @@ export const startFlags = {
   port: flags.integer({
     char: 'p',
     description: "Override environment's port"
+  }),
+  all: flags.boolean({
+    char: 'a',
+    description: 'Run all environments',
+    exclusive: ['name', 'index']
   })
 };

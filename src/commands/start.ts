@@ -1,4 +1,4 @@
-import { Environment } from '@mockoon/commons';
+import { Environment, Environments } from '@mockoon/commons';
 import { Command, flags } from '@oclif/command';
 import { readFile as readJSONFile } from 'jsonfile';
 import { join, resolve } from 'path';
@@ -8,12 +8,15 @@ import { Config } from '../config';
 import { commonFlags, startFlags } from '../constants/command.constants';
 import { Messages } from '../constants/messages.constants';
 import { parseDataFile, prepareData } from '../libs/data';
-import {
-  ConfigProcess,
-  ProcessListManager,
-  ProcessManager
-} from '../libs/process-manager';
+import { ProcessListManager, ProcessManager } from '../libs/process-manager';
 import { portInUse, portIsValid, promptEnvironmentChoice } from '../libs/utils';
+
+interface EnvironmentInfo {
+  name: string;
+  protocol: string;
+  port: number;
+  dataFile: string;
+}
 
 export default class Start extends Command {
   public static description = 'Start a mock API';
@@ -23,7 +26,8 @@ export default class Start extends Command {
     '$ mockoon-cli start --data ~/export-data.json --index 0',
     '$ mockoon-cli start --data https://file-server/export-data.json --index 0',
     '$ mockoon-cli start --data ~/export-data.json --name "Mock environment"',
-    '$ mockoon-cli start --data ~/export-data.json --name "Mock environment" --pname "proc1"'
+    '$ mockoon-cli start --data ~/export-data.json --name "Mock environment" --pname "proc1"',
+    '$ mockoon-cli start --data ~/export-data.json --all'
   ];
 
   public static flags = {
@@ -52,115 +56,176 @@ export default class Start extends Command {
   };
 
   public async run(): Promise<void> {
-    let { flags: userFlags } = this.parse(Start);
+    const { flags: userFlags } = this.parse(Start);
 
-    let environmentInfo: {
-      name: string;
-      protocol: string;
-      port: number;
-      dataFile: string;
-    };
-
-    // We are in a container, env file is ready and relative to the Dockerfile
-    if (userFlags.container) {
-      const environment: Environment = await readJSONFile(
-        userFlags.data,
-        'utf-8'
-      );
-
-      environmentInfo = {
-        dataFile: userFlags.data,
-        name: environment.name,
-        protocol: environment.https ? 'https' : 'http',
-        port: environment.port
-      };
-    } else {
-      const environments = await parseDataFile(userFlags.data);
-
-      userFlags = await promptEnvironmentChoice(userFlags, environments);
-
-      try {
-        environmentInfo = await prepareData(environments, {
-          index: userFlags.index,
-          name: userFlags.name,
-          port: userFlags.port,
-          pname: userFlags.pname
-        });
-      } catch (error) {
-        this.error(error.message);
-      }
-
-      if (!portIsValid(environmentInfo.port)) {
-        this.error(
-          format(Messages.CLI.PORT_IS_NOT_VALID, environmentInfo.port)
-        );
-      }
-
-      if (await portInUse(environmentInfo.port)) {
-        this.error(
-          format(Messages.CLI.PORT_ALREADY_USED, environmentInfo.port)
-        );
-      }
-    }
+    const environmentInfoList = await this.getEnvironmentInfoList(userFlags);
 
     try {
-      const runningProcesses: ProcessDescription[] = await ProcessManager.list();
+      for (const environmentInfo of environmentInfoList) {
+        await this.validatePort(environmentInfo.port);
+        await this.validateName(environmentInfo.name);
 
-      if (
-        runningProcesses
-          .map((process) => process.name)
-          .includes(environmentInfo.name)
-      ) {
-        this.error(
-          format(Messages.CLI.PROCESS_NAME_USED_ERROR, environmentInfo.name)
-        );
+        await this.runEnvironment(environmentInfo);
       }
-
-      const process: Proc = await ProcessManager.start({
-        max_restarts: 1,
-        wait_ready: true,
-        min_uptime: 10000,
-        kill_timeout: 2000,
-        args: ['--data', environmentInfo.dataFile],
-        error: join(Config.logsPath, `${environmentInfo.name}-error.log`),
-        output: join(Config.logsPath, `${environmentInfo.name}-out.log`),
-        name: environmentInfo.name,
-        script: resolve(__dirname, '../libs/server.js'),
-        exec_mode: 'fork'
-      });
-
-      if (process[0].pm2_env.status === 'errored') {
-        // if process is errored we want to delete it
-        await ProcessManager.delete(environmentInfo.name);
-
-        this.error(
-          format(
-            Messages.CLI.PROCESS_START_LOG_ERROR,
-            environmentInfo.name,
-            environmentInfo.name
-          )
-        );
-      }
-
-      this.log(
-        Messages.CLI.PROCESS_STARTED,
-        environmentInfo.protocol,
-        environmentInfo.port,
-        process[0].pm2_env.pm_id,
-        process[0].pm2_env.name
-      );
-
-      const configProcess: ConfigProcess = {
-        name: environmentInfo.name,
-        port: environmentInfo.port,
-        pid: process[0].pm2_env.pm_id
-      };
-
-      await ProcessListManager.addProcess(configProcess);
     } catch (error) {
       this.error(error.message);
     } finally {
       ProcessManager.disconnect();
+    }
+  }
+
+  private async runEnvironment(environmentInfo: EnvironmentInfo) {
+    const process: Proc = await this.startProcess(environmentInfo);
+
+    if (process[0].pm2_env.status === 'errored') {
+      // if process is errored we want to delete it
+      await this.handleProcessError(environmentInfo.name);
+    }
+
+    this.logStartedProcess(environmentInfo, process);
+
+    await this.addProcessToProcessListManager(environmentInfo, process);
+  }
+
+  private async addProcessToProcessListManager(
+    environmentInfo: EnvironmentInfo,
+    process: Proc
+  ): Promise<void> {
+    await ProcessListManager.addProcess({
+      name: environmentInfo.name,
+      port: environmentInfo.port,
+      pid: process[0].pm2_env.pm_id
+    });
+  }
+
+  private logStartedProcess(environmentInfo: EnvironmentInfo, process: Proc) {
+    this.log(
+      Messages.CLI.PROCESS_STARTED,
+      environmentInfo.protocol,
+      environmentInfo.port,
+      process[0].pm2_env.pm_id,
+      process[0].pm2_env.name
+    );
+  }
+
+  private async startProcess(environmentInfo: EnvironmentInfo): Promise<Proc> {
+    return ProcessManager.start({
+      max_restarts: 1,
+      wait_ready: true,
+      min_uptime: 10000,
+      kill_timeout: 2000,
+      args: ['--data', environmentInfo.dataFile],
+      error: join(Config.logsPath, `${environmentInfo.name}-error.log`),
+      output: join(Config.logsPath, `${environmentInfo.name}-out.log`),
+      name: environmentInfo.name,
+      script: resolve(__dirname, '../libs/server.js'),
+      exec_mode: 'fork'
+    });
+  }
+
+  private async handleProcessError(name: string) {
+    // if process is errored we want to delete it
+    await ProcessManager.delete(name);
+
+    this.error(format(Messages.CLI.PROCESS_START_LOG_ERROR, name, name));
+  }
+
+  private async getEnvironmentInfoList(userFlags): Promise<EnvironmentInfo[]> {
+    // We are in a container, env file is ready and relative to the Dockerfile
+    if (userFlags.container) {
+      return this.getEnvInfoListFromContainerFlag(userFlags);
+    }
+
+    return this.getEnvInfoListFromNonContainerFlag(userFlags);
+  }
+
+  private async getEnvInfoListFromContainerFlag(
+    userFlags
+  ): Promise<EnvironmentInfo[]> {
+    const environment: Environment = await readJSONFile(
+      userFlags.data,
+      'utf-8'
+    );
+    let protocol = 'http';
+    if (environment.https) {
+      protocol = 'https';
+    }
+
+    return [
+      {
+        protocol,
+        dataFile: userFlags.data,
+        name: environment.name,
+        port: environment.port
+      }
+    ];
+  }
+
+  private async getEnvInfoListFromNonContainerFlag(
+    userFlags
+  ): Promise<EnvironmentInfo[]> {
+    const environments = await parseDataFile(userFlags.data);
+    if (userFlags.all) {
+      return this.getEnvInfoFromEnvironments(environments);
+    }
+
+    return this.getEnvInfoFromUserChoice(userFlags, environments);
+  }
+
+  private async getEnvInfoFromEnvironments(
+    environments: Environments
+  ): Promise<EnvironmentInfo[]> {
+    const environmentInfoList: EnvironmentInfo[] = [];
+    for (let envIndex = 0; envIndex < environments.length; envIndex++) {
+      try {
+        const environmentInfo = await prepareData(environments, {
+          index: envIndex,
+          name: environments[envIndex].name,
+          port: environments[envIndex].port
+        });
+        environmentInfoList.push(environmentInfo);
+      } catch (error) {
+        this.error(error.message);
+      }
+    }
+
+    return environmentInfoList;
+  }
+
+  private async getEnvInfoFromUserChoice(
+    userFlags,
+    environments: Environments
+  ): Promise<EnvironmentInfo[]> {
+    userFlags = await promptEnvironmentChoice(userFlags, environments);
+    let environmentInfo: EnvironmentInfo;
+    try {
+      environmentInfo = await prepareData(environments, {
+        index: userFlags.index,
+        name: userFlags.name,
+        port: userFlags.port,
+        pname: userFlags.pname
+      });
+    } catch (error) {
+      this.error(error.message);
+    }
+
+    return [environmentInfo];
+  }
+
+  private async validateName(name: string) {
+    const runningProcesses: ProcessDescription[] = await ProcessManager.list();
+    const processNamesList = runningProcesses.map((process) => process.name);
+    if (processNamesList.includes(name)) {
+      this.error(format(Messages.CLI.PROCESS_NAME_USED_ERROR, name));
+    }
+  }
+
+  private async validatePort(port: number) {
+    if (!portIsValid(port)) {
+      this.error(format(Messages.CLI.PORT_IS_NOT_VALID, port));
+    }
+    if (await portInUse(port)) {
+      this.error(format(Messages.CLI.PORT_ALREADY_USED, port));
     }
   }
 }
