@@ -14,6 +14,7 @@ import { portInUse, portIsValid, promptEnvironmentChoice } from '../libs/utils';
 interface EnvironmentInfo {
   name: string;
   protocol: string;
+  hostname: string;
   port: number;
   dataFile: string;
 }
@@ -62,7 +63,7 @@ export default class Start extends Command {
 
     try {
       for (const environmentInfo of environmentInfoList) {
-        await this.validatePort(environmentInfo.port);
+        await this.validatePort(environmentInfo.port, environmentInfo.hostname);
         await this.validateName(environmentInfo.name);
 
         await this.runEnvironment(environmentInfo);
@@ -94,14 +95,18 @@ export default class Start extends Command {
     await ProcessListManager.addProcess({
       name: environmentInfo.name,
       port: environmentInfo.port,
+      hostname: environmentInfo.hostname,
       pid: process[0].pm2_env.pm_id
     });
   }
 
   private logStartedProcess(environmentInfo: EnvironmentInfo, process: Proc) {
+    const hostname = environmentInfo.hostname === '0.0.0.0' ? 'localhost' : environmentInfo.hostname;
+
     this.log(
       Messages.CLI.PROCESS_STARTED,
       environmentInfo.protocol,
+      hostname,
       environmentInfo.port,
       process[0].pm2_env.pm_id,
       process[0].pm2_env.name
@@ -156,6 +161,7 @@ export default class Start extends Command {
         protocol,
         dataFile: userFlags.data,
         name: environment.name,
+        hostname: environment.hostname,
         port: environment.port
       }
     ];
@@ -220,11 +226,11 @@ export default class Start extends Command {
     }
   }
 
-  private async validatePort(port: number) {
+  private async validatePort(port: number, hostname: string) {
     if (!portIsValid(port)) {
       this.error(format(Messages.CLI.PORT_IS_NOT_VALID, port));
     }
-    if (await portInUse(port)) {
+    if (await portInUse(port, hostname)) {
       this.error(format(Messages.CLI.PORT_ALREADY_USED, port));
     }
   }

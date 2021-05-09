@@ -144,6 +144,7 @@ export const prepareData = async (
 ): Promise<{
   name: string;
   protocol: string;
+  hostname: string;
   port: number;
   dataFile: string;
 }> => {
@@ -174,6 +175,7 @@ export const prepareData = async (
   return {
     name: environment.name,
     protocol: environment.https ? 'https' : 'http',
+    hostname: environment.hostname,
     port: environment.port,
     dataFile
   };
