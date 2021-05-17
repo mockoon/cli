@@ -78,9 +78,8 @@ export default class Stop extends Command {
     for (const processToStop of processesToStop) {
       try {
         // typing is wrong, delete() returns an array
-        const stoppedProcesses: ProcessDescription[] = (await ProcessManager.delete(
-          processToStop
-        )) as ProcessDescription[];
+        const stoppedProcesses: ProcessDescription[] =
+          (await ProcessManager.delete(processToStop)) as ProcessDescription[];
         // verify that something has been stopped
         stoppedProcesses.forEach((stoppedProcess) => {
           if (stoppedProcess !== undefined) {
@@ -105,7 +104,8 @@ export default class Stop extends Command {
     }
 
     try {
-      const runningProcesses: ProcessDescription[] = await ProcessManager.list();
+      const runningProcesses: ProcessDescription[] =
+        await ProcessManager.list();
 
       if (relistProcesses) {
         if (runningProcesses.length) {
