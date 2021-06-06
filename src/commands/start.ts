@@ -101,7 +101,10 @@ export default class Start extends Command {
   }
 
   private logStartedProcess(environmentInfo: EnvironmentInfo, process: Proc) {
-    const hostname = environmentInfo.hostname === '0.0.0.0' ? 'localhost' : environmentInfo.hostname;
+    const hostname =
+      environmentInfo.hostname === '0.0.0.0'
+        ? 'localhost'
+        : environmentInfo.hostname;
 
     this.log(
       Messages.CLI.PROCESS_STARTED,
@@ -209,6 +212,7 @@ export default class Start extends Command {
         index: userFlags.index,
         name: userFlags.name,
         port: userFlags.port,
+        hostname: userFlags.hostname,
         pname: userFlags.pname
       });
     } catch (error) {
