@@ -20,10 +20,6 @@ export const startFlags = {
     description: "Environment's index in the data file",
     exclusive: ['name']
   }),
-  hostname: flags.string({
-    char: 'l',
-    description: 'Listening hostname/address'
-  }),
   port: flags.integer({
     char: 'p',
     description: "Override environment's port"

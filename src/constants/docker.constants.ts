@@ -4,7 +4,7 @@ RUN npm install -g @mockoon/cli@{{{version}}}
 COPY {{{filePath}}} ./data
 
 # Build runner script
-RUN echo "mockoon-cli start \\"\\$@\\"; sleep infinity & wait \\$!" > mockoon-runner.sh
+RUN echo "mockoon-cli start \\\\"\\\\$@\\\\" -l 0.0.0.0; sleep infinity & wait \\\\$!" > mockoon-runner.sh
 
 # Do not run as root.
 RUN adduser --shell /bin/sh --disabled-password --gecos "" mockoon

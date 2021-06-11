@@ -38,6 +38,10 @@ export default class Start extends Command {
       char: 'N',
       description: 'Override the process name'
     }),
+    hostname: flags.string({
+      char: 'l',
+      description: 'Listening hostname/address'
+    }),
     /**
      * /!\ Undocumented flag.
      * Mostly for internal use when `start `command is called during
