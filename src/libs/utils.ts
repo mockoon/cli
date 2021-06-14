@@ -39,7 +39,8 @@ export const logProcesses = (processes: ProcessDescription[]): void => {
       },
       hostname: {
         minWidth: 15,
-        get: (row) => configProcesses.find((data) => data.name === row.name)?.hostname
+        get: (row) =>
+          configProcesses.find((data) => data.name === row.name)?.hostname
       },
       port: {
         minWidth: 7,
@@ -76,8 +77,10 @@ export const filterProcesses = (
  * Check if a port is already in use
  * @param port
  */
-export const portInUse = async (port: number, hostname: string): Promise<boolean> =>
-  await isPortReachable(port, { host: hostname });
+export const portInUse = async (
+  port: number,
+  hostname: string
+): Promise<boolean> => await isPortReachable(port, { host: hostname });
 
 /**
  * Check if a port is valid
