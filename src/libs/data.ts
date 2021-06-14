@@ -139,11 +139,18 @@ const getEnvironment = (
  */
 export const prepareData = async (
   environments: Environments,
-  options: { name?: string; index?: number; port?: number; pname?: string },
+  options: {
+    name?: string;
+    index?: number;
+    port?: number;
+    pname?: string;
+    hostname?: string;
+  },
   dockerfileDir?: string
 ): Promise<{
   name: string;
   protocol: string;
+  hostname: string;
   port: number;
   dataFile: string;
 }> => {
@@ -160,6 +167,10 @@ export const prepareData = async (
     environment.port = options.port;
   }
 
+  if (options.hostname !== undefined) {
+    environment.hostname = options.hostname;
+  }
+
   let dataFile: string = join(Config.dataPath, `${environment.name}.json`);
 
   // if we are building a Dockerfile, we want the data in the same folder
@@ -174,6 +185,7 @@ export const prepareData = async (
   return {
     name: environment.name,
     protocol: environment.https ? 'https' : 'http',
+    hostname: environment.hostname,
     port: environment.port,
     dataFile
   };

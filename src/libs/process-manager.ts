@@ -13,6 +13,7 @@ export type ConfigProcess = {
   name?: string;
   pid: number;
   port: number;
+  hostname: string;
 };
 
 /**
