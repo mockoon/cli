@@ -86,6 +86,7 @@ Mockoon's CLI has been tested on Node.js versions 10, 12, 14, and 15.
 
 ### Mockoon data files
 
+The CLI currently supports only data files exported using the [main application](https://mockoon.com) in Mockoon's own format. 
 The CLI can import and migrate data from older versions of Mockoon. If you exported the data file with a more recent version of the application, you may need to update your CLI with the following command: `npm install -g @mockoon/cli`.
 
 ## Commands

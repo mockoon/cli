@@ -39,7 +39,7 @@ export const parseDataFile = async (
 
   // verify export file new format
   if (!dataExport.source || !dataExport.data) {
-    throw new Error(Messages.CLI.DATA_FILE_TOO_OLD_ERROR);
+    throw new Error(Messages.CLI.DATA_FILE_FORMAT_ERROR);
   }
 
   // Extract all environments, eventually filter items of type 'route'
