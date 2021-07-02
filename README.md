@@ -107,12 +107,13 @@ USAGE
   $ mockoon-cli start
 
 OPTIONS
+  -a, --all          Run all environments
   -d, --data=data    (required) Path or URL to your Mockoon data export file
   -i, --index=index  Environment's index in the data file
   -n, --name=name    Environment name in the data file
-  -p, --port=port    Override environment's port
   -N, --pname=pname    Override process name
-  -a, --all          Run all environments
+  -p, --port=port    Override environment's port
+  -l, --hostname=0.0.0.0    Override default listening hostname (0.0.0.0)
   -h, --help         show CLI help
 
 EXAMPLES
