@@ -97,9 +97,7 @@ describe('Stop with wrong arg and list', () => {
     .command(['stop', '99'])
     .it('should return error and "no process running" message', (context) => {
       expect(context.stderr).to.contain('Process 99 not found');
-      expect(context.stdout).to.contain(
-        'Running processes:\nName          Id   Status    Cpu    Memory    Port   \nmockoon-mock1'
-      );
+      expect(context.stdout).to.contain('mockoon-mock1');
     });
 
   stopProcesses('0', ['mockoon-mock1']);

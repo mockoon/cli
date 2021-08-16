@@ -5,7 +5,7 @@ export const Messages = {
   CLI: {
     RUNNING_PROCESSES: 'Running processes:',
     PROCESS_STOPPED: 'Process %d:%s stopped',
-    PROCESS_STARTED: 'Mock started at %s://localhost:%d (pid: %d, name: %s)',
+    PROCESS_STARTED: 'Mock started at %s://%s:%d (pid: %d, name: %s)',
     DOCKERIZE_SUCCESS: 'Dockerfile was generated and saved to %s',
     DOCKERIZE_BUILD_COMMAND:
       'Run the following commands to build the image and run the container:\n    cd %s\n    docker build -t %s .\n    docker run -d -p %d:%d %s',
@@ -19,8 +19,8 @@ export const Messages = {
     NO_RUNNING_PROCESS: 'No process is running',
     MISSING_INDEX_OR_NAME_ERROR:
       '--index or --name is missing, you must provide one of them',
-    DATA_FILE_TOO_OLD_ERROR:
-      'This export file is too old and cannot be run with the CLI\nPlease re-export the data using a more recent version of the application',
+    DATA_FILE_FORMAT_ERROR:
+      'This data file is either too old or is not a valid Mockoon export file.\nPlease re-export the data using a more recent version of the application (For more information: https://github.com/mockoon/cli#export-your-mock-to-use-in-the-cli)',
     DATA_TOO_OLD_ERROR:
       "These environment's data are too old and cannot be run with the CLI\nPlease migrate them using a more recent version of the application",
     DATA_TOO_RECENT_ERROR:

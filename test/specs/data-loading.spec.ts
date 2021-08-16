@@ -101,7 +101,7 @@ describe('Data loading', () => {
     .command(['start', '--data', './test/data/old-format.json', '-i', '0'])
     .catch((context) => {
       expect(context.message).to.contain(
-        'This export file is too old and cannot be run with the CLI'
+        'This data file is either too old or is not a valid Mockoon export file'
       );
     })
     .it('should fail when data is in old format');
