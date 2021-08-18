@@ -15,8 +15,8 @@
   <h1>@Mockoon/cli</h1>
 </div>
 
-Welcome to Mockoon's official CLI, a lightweight and fast NPM package to deploy your mock APIs anywhere. 
-Feed it with a Mockoon's [export file](https://mockoon.com/docs/latest/import-export-data/), and you are good to go. 
+Welcome to Mockoon's official CLI, a lightweight and fast NPM package to deploy your mock APIs anywhere.
+Feed it with a Mockoon's [export file](https://mockoon.com/docs/latest/import-export-data/), and you are good to go.
 
 The CLI supports the same features as the main application: [templating system](https://mockoon.com/docs/latest/templating/overview/), [proxy mode](https://mockoon.com/docs/latest/proxy-mode/), [route response rules](https://mockoon.com/docs/latest/route-responses/dynamic-rules/), etc.
 
@@ -48,7 +48,7 @@ The CLI supports the same features as the main application: [templating system](
 $ npm install -g @mockoon/cli
 ```
 
-Usage: 
+Usage:
 
 ```sh-session
 $ mockoon-cli COMMAND
@@ -58,23 +58,22 @@ $ mockoon-cli COMMAND
 
 The CLI is compatible with Mockoon export files starting from version 1.7.0.
 
-To export your environment(s) to use them in the CLI, follow these steps: 
+To export your environment(s) to use them in the CLI, follow these steps:
 
-1. Open the `Import/export` application menu and choose `Mockoon's format -> Export all environments to a file (JSON)` or `Mockoon's format -> Export current environment to a file (JSON)`. 
-  
-    ![Export to a file](/docs/export-to-file.png)
-  
-    > You can also right-click on one of the environments and select `Copy to clipboard (JSON)`. You will then have to manually create a file and paste the environment's JSON data.
-  
-    ![Export to a file](/docs/export-to-clipboard.png)
-  
+1. Open the `Import/export` application menu and choose `Mockoon's format -> Export all environments to a file (JSON)` or `Mockoon's format -> Export current environment to a file (JSON)`.
+
+   ![Export to a file](/docs/export-to-file.png)
+
+   > You can also right-click on one of the environments and select `Copy to clipboard (JSON)`. You will then have to manually create a file and paste the environment's JSON data.
+
+   ![Export to a file](/docs/export-to-clipboard.png)
+
 2. Choose a folder to save the JSON file.
-   
 3. Use the [start command](#mockoon-cli-start) below to launch your mock APIs with the CLI:
 
-    ```sh-sessions
-    $ mockoon-cli start --data ~/path/to/your-file.json -i 0
-    ```
+   ```sh-sessions
+   $ mockoon-cli start --data ~/path/to/your-file.json -i 0
+   ```
 
 You will find more details in the [official documentation](https://mockoon.com/docs/latest/import-export-data/).
 
@@ -86,7 +85,7 @@ Mockoon's CLI has been tested on Node.js versions 10, 12, 14, and 15.
 
 ### Mockoon data files
 
-The CLI currently supports only data files exported using the [main application](https://mockoon.com) in Mockoon's own format. 
+The CLI currently supports only data files exported using the [main application](https://mockoon.com) in Mockoon's own format.
 The CLI can import and migrate data from older versions of Mockoon. If you exported the data file with a more recent version of the application, you may need to update your CLI with the following command: `npm install -g @mockoon/cli`.
 
 ## Commands
@@ -172,8 +171,8 @@ EXAMPLE
 
 ### `mockoon-cli dockerize`
 
-Generates a Dockerfile used to build a self-contained image of a mock API. After building the image, no additional parameters will be needed when running the container. 
-This command takes similar flags as the [`start` command](#mockoon-start). 
+Generates a Dockerfile used to build a self-contained image of a mock API. After building the image, no additional parameters will be needed when running the container.
+This command takes similar flags as the [`start` command](#mockoon-start).
 
 Please note that this command will extract your Mockoon environment from the export file you provide and put it side by side with the generated Dockerfile. Both files are required in order to build the image.
 
@@ -217,9 +216,9 @@ OPTIONS
 
 ### Using the generic Docker image
 
-A generic Docker image is published on the [Docker Hub Mockoon CLI repository](https://hub.docker.com/repository/docker/mockoon/cli). It uses `node:14-alpine` and installs the latest version of Mockoon CLI. 
+A generic Docker image is published on the [Docker Hub Mockoon CLI repository](https://hub.docker.com/r/mockoon/cli). It uses `node:14-alpine` and installs the latest version of Mockoon CLI.
 
-All of `mockoon-cli start` flags (`--port`, `--index`, etc.) must be provided when running the container. 
+All of `mockoon-cli start` flags (`--port`, `--index`, etc.) must be provided when running the container.
 
 To load the Mockoon data, you can either mount a local data file and pass `mockoon-cli start` flags at the end of the command:
 
@@ -238,15 +237,15 @@ You can use the [`dockerize` command](#mockoon-cli-dockerize) to generate a new 
   `mockoon-cli dockerize --data ./sample-data.json --port 3000 --index 0 --output ./tmp/Dockerfile`
 
 - navigate to the `tmp` folder, where the Dockerfile has been generated:
-  
+
   `cd tmp`
 
 - Build the image:
-  
+
   `docker build -t mockoon-mock1 .`
 
 - Run the container:
-  
+
   `docker run -d -p <host_port>:3000 mockoon-mock1`
 
 ## Logs
@@ -259,7 +258,7 @@ The `out.log` file contains all other log entries (all levels) produced by the r
 
 ## PM2
 
-Mockoon CLI uses [PM2](https://pm2.keymetrics.io/) to start, stop or list the running mock APIs. Therefore, you can directly use PM2 commands to manage the processes. 
+Mockoon CLI uses [PM2](https://pm2.keymetrics.io/) to start, stop or list the running mock APIs. Therefore, you can directly use PM2 commands to manage the processes.
 
 ## Mockoon's documentation
 
