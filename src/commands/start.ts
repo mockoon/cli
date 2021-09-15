@@ -210,7 +210,9 @@ export default class Start extends Command {
     environments: Environments
   ): Promise<EnvironmentInfo[]> {
     userFlags = await promptEnvironmentChoice(userFlags, environments);
+
     let environmentInfo: EnvironmentInfo;
+
     try {
       environmentInfo = await prepareData(environments, {
         index: userFlags.index,

@@ -1,12 +1,14 @@
 import {
   Environment,
   Environments,
+  EnvironmentSchema,
   Export,
   HighestMigrationId,
   Migrations
 } from '@mockoon/commons';
 import axios from 'axios';
 import { promises as fs } from 'fs';
+import { prompt } from 'inquirer';
 import { readFile as readJSONFile } from 'jsonfile';
 import * as mkdirp from 'mkdirp';
 import { join } from 'path';
@@ -63,29 +65,52 @@ export const parseDataFile = async (
 
 /**
  * Check if an environment can be run by the CLI and
- * migrate it if needed
+ * migrate it if needed.
+ * Validate the environment schema (will automatically repair)
  *
  * @param environment
  */
-const migrateEnvironment = (environment: Environment) => {
+const migrateAndValidateEnvironment = async (
+  environment: Environment,
+  environmentName: string | undefined
+) => {
   // environment data are too old: lastMigration is not present
   if (environment.lastMigration === undefined) {
-    throw new Error(Messages.CLI.DATA_TOO_OLD_ERROR);
+    const promptResponse: { load: string } = await prompt([
+      {
+        name: 'load',
+        message: `${
+          environmentName ? '"' + environmentName + '"' : 'This environment'
+        } does not seem to be a valid Mockoon environment or is too old. Load it anyway? (Mockoon CLI will attempt to repair it)`,
+        type: 'confirm',
+        default: true
+      }
+    ]);
+
+    if (!promptResponse.load) {
+      throw new Error(Messages.CLI.DATA_TOO_OLD_ERROR);
+    }
   }
 
-  // environment data migrated with a more recent version (CLI does not include @mockoon/commons with required migrations)
+  // environment data migrated with a more recent version (if installed CLI version does not include @mockoon/commons with required migrations)
   if (environment.lastMigration > HighestMigrationId) {
     throw new Error(Messages.CLI.DATA_TOO_RECENT_ERROR);
   }
 
-  // apply migrations
-  Migrations.forEach((migration) => {
-    if (migration.id > environment.lastMigration) {
-      migration.migrationFunction(environment);
-    }
-  });
+  try {
+    // apply migrations
+    Migrations.forEach((migration) => {
+      if (migration.id > environment.lastMigration) {
+        migration.migrationFunction(environment);
+      }
+    });
+  } catch (error) {
+    environment.lastMigration = HighestMigrationId;
+  }
 
-  return environment;
+  const validatedEnvironment = EnvironmentSchema.validate(environment).value;
+
+  return validatedEnvironment;
 };
 
 /**
@@ -156,7 +181,7 @@ export const prepareData = async (
 }> => {
   let environment: Environment = getEnvironment(environments, options);
 
-  environment = migrateEnvironment(environment);
+  environment = await migrateAndValidateEnvironment(environment, options.name);
 
   // transform the provided name or env's name to be used as process name
   environment.name = transformEnvironmentName(
