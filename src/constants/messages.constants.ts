@@ -19,8 +19,6 @@ export const Messages = {
     NO_RUNNING_PROCESS: 'No process is running',
     MISSING_INDEX_OR_NAME_ERROR:
       '--index or --name is missing, you must provide one of them',
-    DATA_FILE_FORMAT_ERROR:
-      'This data file is either too old or is not a valid Mockoon export file.\nPlease re-export the data using a more recent version of the application (For more information: https://github.com/mockoon/cli#export-your-mock-to-use-in-the-cli)',
     DATA_TOO_OLD_ERROR:
       "These environment's data are too old or not a valid Mockoon environment.\nPlease verify or migrate them using a more recent version of the application",
     DATA_TOO_RECENT_ERROR:

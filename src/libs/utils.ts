@@ -91,7 +91,8 @@ export const portIsValid = (port: number): boolean => port >= 0 && port < 65536;
 
 /**
  * Check if --index or --name flag are provided and
- * prompt user to choose an environment
+ * prompt user to choose an environment if not.
+ * If there is only one environment, launch it by default
  *
  * @param flags
  * @param environments
@@ -103,18 +104,23 @@ export const promptEnvironmentChoice = async <
   environments: Environments
 ): Promise<T> => {
   if (flags.index === undefined && !flags.name) {
-    const response: { environment: string } = await prompt([
-      {
-        name: 'environment',
-        message: 'Please select an environment',
-        type: 'list',
-        choices: environments.map((environment) => ({
-          name: environment.name
-        }))
-      }
-    ]);
+    if (environments.length === 1) {
+      flags.index = 0;
+    } else {
+      const response: { environmentIndex: number } = await prompt([
+        {
+          name: 'environmentIndex',
+          message: 'Please select an environment',
+          type: 'list',
+          choices: environments.map((environment, environmentIndex) => ({
+            name: environment.name || environmentIndex,
+            value: environmentIndex
+          }))
+        }
+      ]);
 
-    flags.name = response.environment;
+      flags.index = response.environmentIndex;
+    }
   }
 
   return flags;

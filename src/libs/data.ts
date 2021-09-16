@@ -19,42 +19,39 @@ import { Messages } from '../constants/messages.constants';
 import { transformEnvironmentName } from './utils';
 
 /**
- * Load and parse a JSON data file
+ * Load and parse a JSON data file.
+ * Supports both export files (with one or multiple envs) or new environment files.
  *
  * @param filePath
  */
 export const parseDataFile = async (
   filePath: string
 ): Promise<Environments> => {
-  let dataExport: Export;
+  let loadedData: Export | Environment;
 
   if (filePath.indexOf('http') !== 0) {
-    dataExport = await readJSONFile(filePath, 'utf-8');
+    loadedData = await readJSONFile(filePath, 'utf-8');
   } else {
     const { data: responseData } = await axios.get(filePath, { timeout: 5000 });
 
-    dataExport =
+    loadedData =
       typeof responseData === 'string'
         ? JSON.parse(responseData)
         : responseData;
   }
+  const environments: Environments = [];
 
-  // verify export file new format
-  if (!dataExport.source || !dataExport.data) {
-    throw new Error(Messages.CLI.DATA_FILE_FORMAT_ERROR);
-  }
-
-  // Extract all environments, eventually filter items of type 'route'
-  const environments = dataExport.data.reduce<Environments>(
-    (newEnvironments, dataItem) => {
+  // we have an export file
+  if ('source' in loadedData && 'data' in loadedData) {
+    // Extract all environments, eventually filter items of type 'route'
+    loadedData.data.forEach((dataItem) => {
       if (dataItem.type === 'environment') {
-        newEnvironments.push(dataItem.item);
+        environments.push(dataItem.item);
       }
-
-      return newEnvironments;
-    },
-    []
-  );
+    });
+  } else if (typeof loadedData === 'object') {
+    environments.push(loadedData);
+  }
 
   if (environments.length === 0) {
     throw new Error(Messages.CLI.ENVIRONMENT_NOT_AVAILABLE_ERROR);

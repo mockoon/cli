@@ -95,14 +95,4 @@ describe('Data loading', () => {
       );
     })
     .it('should fail when there is no environment with requested name');
-
-  test
-    .stderr()
-    .command(['start', '--data', './test/data/old-format.json', '-i', '0'])
-    .catch((context) => {
-      expect(context.message).to.contain(
-        'This data file is either too old or is not a valid Mockoon export file'
-      );
-    })
-    .it('should fail when data is in old format');
 });

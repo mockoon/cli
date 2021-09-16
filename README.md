@@ -3,7 +3,7 @@
     <img width="200" height="200" src="https://mockoon.com/images/logo-square-cli.png">
   </a>
   <br>
-  <a href="https://mockoon.com/#download"><img src="https://img.shields.io/badge/Download%20app-Go-green.svg?style=flat-square&colorB=1997c6"/></a>
+  <a href="https://mockoon.com/download/"><img src="https://img.shields.io/badge/Download%20app-Go-green.svg?style=flat-square&colorB=1997c6"/></a>
   <a href="https://mockoon.com/"><img src="https://img.shields.io/badge/Website-Go-green.svg?style=flat-square&colorB=1997c6"/></a>
   <a href="http://eepurl.com/dskB2X"><img src="https://img.shields.io/badge/Newsletter-Subscribe-green.svg?style=flat-square"/></a>
   <a href="https://twitter.com/GetMockoon"><img src="https://img.shields.io/badge/Twitter_@GetMockoon-follow-blue.svg?style=flat-square&colorB=1da1f2"/></a>
@@ -23,7 +23,9 @@ The CLI supports the same features as the main application: [templating system](
 ![Mockoon CLI screenshot](./docs/screenshot.png)
 
 - [Installation](#installation)
-- [Export your mock to use in the CLI](#export-your-mock-to-use-in-the-cli)
+- [Use your mocks in the CLI](#use-your-mocks-in-the-cli)
+  - [Use a Mockoon environment file (preferred method)](#use-a-mockoon-environment-file-preferred-method)
+  - [Use a Mockoon export file](#use-a-mockoon-export-file)
 - [Compatibility](#compatibility)
 - [Commands](#commands)
   - [`mockoon-cli start`](#mockoon-cli-start)
@@ -54,9 +56,26 @@ Usage:
 $ mockoon-cli COMMAND
 ```
 
-## Export your mock to use in the CLI
+## Use your mocks in the CLI
 
-The CLI is compatible with Mockoon export files starting from version 1.7.0.
+The CLI currently supports only data files (exported or not) in Mockoon's format.
+The CLI can import and migrate data from older versions of Mockoon. However, it doesn't alter the file you provide and only migrates a copy. If you created or exported your mock with a more recent version of the application, you need to update your CLI with the following command: `npm install -g @mockoon/cli`.
+
+Two methods are available to run your mocks with the CLI: directly using a Mockoon's environment file or an export file.
+
+### Use a Mockoon environment file (preferred method)
+
+Following Mockoon's changes in version [1.16.0](https://github.com/mockoon/mockoon/releases/tag/v1.16.0) and starting with CLI [v1.2.0](https://github.com/mockoon/cli/releases/tag/v1.2.0), the CLI is directly compatible with Mockoon's environment file, without the need to use the export method (see below).
+
+You can run your mock in one single step using the [start command](#mockoon-cli-start):
+
+```sh-sessions
+$ mockoon-cli start --data ~/path/to/your-environment-file.json
+```
+
+### Use a Mockoon export file
+
+While we recommend using the method above to launch your mocks with the CLI, you can still use Mockoon's export feature. The advantage of this method is that it allows exporting multiple mocks and run them together with one [start command](#mockoon-cli-start) and the `--all` flag.
 
 To export your environment(s) to use them in the CLI, follow these steps:
 
@@ -72,21 +91,14 @@ To export your environment(s) to use them in the CLI, follow these steps:
 3. Use the [start command](#mockoon-cli-start) below to launch your mock APIs with the CLI:
 
    ```sh-sessions
-   $ mockoon-cli start --data ~/path/to/your-file.json -i 0
+   $ mockoon-cli start --data ~/path/to/your-export-file.json -i 0
    ```
 
 You will find more details in the [official documentation](https://mockoon.com/docs/latest/import-export-data/).
 
 ## Compatibility
 
-### Node.js
-
 Mockoon's CLI has been tested on Node.js versions 10, 12, 14, and 15.
-
-### Mockoon data files
-
-The CLI currently supports only data files exported using the [main application](https://mockoon.com) in Mockoon's own format.
-The CLI can import and migrate data from older versions of Mockoon. If you exported the data file with a more recent version of the application, you may need to update your CLI with the following command: `npm install -g @mockoon/cli`.
 
 ## Commands
 
@@ -98,7 +110,9 @@ The CLI can import and migrate data from older versions of Mockoon. If you expor
 
 ### `mockoon-cli start`
 
-Starts a mock API from a Mockoon's export file environment. As an export file can contain multiple environments, you can indicate the one you want to run by specifying its index in the file or its name.
+Starts a mock API from a Mockoon's environment file or export file. As an export file can contain multiple environments, you can indicate the one you want to run by specifying its index in the file or its name.
+If only one environment is present in the file, you can omit the index, and the CLI will run it by default.
+
 The process will be created by default with the name and port of the Mockoon's environment. You can override these values by using the `--port` and `--pname` flags.
 
 ```
@@ -107,7 +121,7 @@ USAGE
 
 OPTIONS
   -a, --all          Run all environments
-  -d, --data=data    (required) Path or URL to your Mockoon data export file
+  -d, --data=data    (required) Path or URL to your Mockoon file
   -i, --index=index  Environment's index in the data file
   -n, --name=name    Environment name in the data file
   -N, --pname=pname    Override process name
@@ -116,12 +130,12 @@ OPTIONS
   -h, --help         show CLI help
 
 EXAMPLES
-  $ mockoon-cli start --data ~/export-data.json
-  $ mockoon-cli start --data ~/export-data.json --index 0
-  $ mockoon-cli start --data https://file-server/export-data.json --index 0
-  $ mockoon-cli start --data ~/export-data.json --name "Mock environment"
-  $ mockoon-cli start --data ~/export-data.json --name "Mock environment" --pname "proc1"
-  $ mockoon-cli start --data ~/export-data.json --all
+  $ mockoon-cli start --data ~/data.json
+  $ mockoon-cli start --data ~/data.json --index 0
+  $ mockoon-cli start --data https://file-server/data.json --index 0
+  $ mockoon-cli start --data ~/data.json --name "Mock environment"
+  $ mockoon-cli start --data ~/data.json --name "Mock environment" --pname "proc1"
+  $ mockoon-cli start --data ~/data.json --all
 ```
 
 ### `mockoon-cli list [ID]`
@@ -174,7 +188,7 @@ EXAMPLE
 Generates a Dockerfile used to build a self-contained image of a mock API. After building the image, no additional parameters will be needed when running the container.
 This command takes similar flags as the [`start` command](#mockoon-start).
 
-Please note that this command will extract your Mockoon environment from the export file you provide and put it side by side with the generated Dockerfile. Both files are required in order to build the image.
+Please note that this command will extract your Mockoon environment from the file you provide and put it side by side with the generated Dockerfile. Both files are required in order to build the image.
 
 For more information on how to build the image: [Using the dockerize command](#using-the-dockerize-command)
 
@@ -183,7 +197,7 @@ USAGE
   $ mockoon-cli dockerize
 
 OPTIONS
-  -d, --data=data    (required) Path or URL to your Mockoon data export file
+  -d, --data=data    (required) Path or URL to your Mockoon file
   -i, --index=index  Environment's index in the data file
   -n, --name=name    Environment name in the data file
   -p, --port=port    Override environment's port
@@ -191,10 +205,10 @@ OPTIONS
   -h, --help         show CLI help
 
 EXAMPLES
-  $ mockoon-cli dockerize --data ~/export-data.json --output ./Dockerfile
-  $ mockoon-cli dockerize --data ~/export-data.json --index 0 --output ./Dockerfile
-  $ mockoon-cli dockerize --data https://file-server/export-data.json --index 0 --output ./Dockerfile
-  $ mockoon-cli dockerize --data ~/export-data.json --name "Mock environment" --output ./Dockerfile
+  $ mockoon-cli dockerize --data ~/data.json --output ./Dockerfile
+  $ mockoon-cli dockerize --data ~/data.json --index 0 --output ./Dockerfile
+  $ mockoon-cli dockerize --data https://file-server/data.json --index 0 --output ./Dockerfile
+  $ mockoon-cli dockerize --data ~/data.json --name "Mock environment" --output ./Dockerfile
 ```
 
 ### `mockoon-cli help [COMMAND]`

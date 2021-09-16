@@ -23,12 +23,12 @@ export default class Start extends Command {
   public static description = 'Start a mock API';
 
   public static examples = [
-    '$ mockoon-cli start --data ~/export-data.json',
-    '$ mockoon-cli start --data ~/export-data.json --index 0',
-    '$ mockoon-cli start --data https://file-server/export-data.json --index 0',
-    '$ mockoon-cli start --data ~/export-data.json --name "Mock environment"',
-    '$ mockoon-cli start --data ~/export-data.json --name "Mock environment" --pname "proc1"',
-    '$ mockoon-cli start --data ~/export-data.json --all'
+    '$ mockoon-cli start --data ~/data.json',
+    '$ mockoon-cli start --data ~/data.json --index 0',
+    '$ mockoon-cli start --data https://file-server/data.json --index 0',
+    '$ mockoon-cli start --data ~/data.json --name "Mock environment"',
+    '$ mockoon-cli start --data ~/data.json --name "Mock environment" --pname "proc1"',
+    '$ mockoon-cli start --data ~/data.json --all'
   ];
 
   public static flags = {
@@ -178,6 +178,7 @@ export default class Start extends Command {
     userFlags
   ): Promise<EnvironmentInfo[]> {
     const environments = await parseDataFile(userFlags.data);
+
     if (userFlags.all) {
       return this.getEnvInfoFromEnvironments(environments);
     }
@@ -189,6 +190,7 @@ export default class Start extends Command {
     environments: Environments
   ): Promise<EnvironmentInfo[]> {
     const environmentInfoList: EnvironmentInfo[] = [];
+
     for (let envIndex = 0; envIndex < environments.length; envIndex++) {
       try {
         const environmentInfo = await prepareData(environments, {
@@ -196,6 +198,7 @@ export default class Start extends Command {
           name: environments[envIndex].name,
           port: environments[envIndex].port
         });
+
         environmentInfoList.push(environmentInfo);
       } catch (error) {
         this.error(error.message);

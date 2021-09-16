@@ -70,3 +70,16 @@ describe('Run an https mock and verify displayed information', () => {
 
   stopProcesses('mockoon-mockhttps', ['mockoon-mockhttps']);
 });
+
+describe('Run single mock from an environment file (not an export file), run the only available mock (no index to provide)', () => {
+  test
+    .stdout()
+    .command(['start', '--data', './test/data/environment.json'])
+    .it('should start mock on port 3000', (context) => {
+      expect(context.stdout).to.contain(
+        'Mock started at http://localhost:3000 (pid: 0, name: mockoon-environment-file)'
+      );
+    });
+
+  stopProcesses('mockoon-environment-file');
+});
