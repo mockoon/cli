@@ -2,6 +2,7 @@ import { Environments } from '@mockoon/commons';
 import { cli } from 'cli-ux';
 import { prompt } from 'inquirer';
 import * as isPortReachable from 'is-port-reachable';
+import { dirname } from 'path';
 import { ProcessDescription } from 'pm2';
 import * as prettyBytes from 'pretty-bytes';
 import { processPrefix } from '../constants/common.constants';
@@ -124,4 +125,18 @@ export const promptEnvironmentChoice = async <
   }
 
   return flags;
+};
+
+/**
+ * Get the path directory, except if it's a URL.
+ *
+ * @param path
+ * @returns
+ */
+export const getDirname = (path: string): string | null => {
+  if (!path.startsWith('http')) {
+    return dirname(path);
+  }
+
+  return null;
 };

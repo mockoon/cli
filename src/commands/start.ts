@@ -9,7 +9,12 @@ import { commonFlags, startFlags } from '../constants/command.constants';
 import { Messages } from '../constants/messages.constants';
 import { parseDataFile, prepareData } from '../libs/data';
 import { ProcessListManager, ProcessManager } from '../libs/process-manager';
-import { portInUse, portIsValid, promptEnvironmentChoice } from '../libs/utils';
+import {
+  getDirname,
+  portInUse,
+  portIsValid,
+  promptEnvironmentChoice
+} from '../libs/utils';
 
 interface EnvironmentInfo {
   name: string;
@@ -17,6 +22,7 @@ interface EnvironmentInfo {
   hostname: string;
   port: number;
   dataFile: string;
+  initialDataDir?: string | null;
 }
 
 export default class Start extends Command {
@@ -121,12 +127,18 @@ export default class Start extends Command {
   }
 
   private async startProcess(environmentInfo: EnvironmentInfo): Promise<Proc> {
+    const args = ['--data', environmentInfo.dataFile];
+
+    if (environmentInfo.initialDataDir) {
+      args.push('--environmentDir', environmentInfo.initialDataDir);
+    }
+
     return ProcessManager.start({
       max_restarts: 1,
       wait_ready: true,
       min_uptime: 10000,
       kill_timeout: 2000,
-      args: ['--data', environmentInfo.dataFile],
+      args,
       error: join(Config.logsPath, `${environmentInfo.name}-error.log`),
       output: join(Config.logsPath, `${environmentInfo.name}-out.log`),
       name: environmentInfo.name,
@@ -159,6 +171,7 @@ export default class Start extends Command {
       'utf-8'
     );
     let protocol = 'http';
+
     if (environment.https) {
       protocol = 'https';
     }
@@ -169,7 +182,8 @@ export default class Start extends Command {
         dataFile: userFlags.data,
         name: environment.name,
         hostname: environment.hostname,
-        port: environment.port
+        port: environment.port,
+        initialDataDir: null
       }
     ];
   }
@@ -180,13 +194,14 @@ export default class Start extends Command {
     const environments = await parseDataFile(userFlags.data);
 
     if (userFlags.all) {
-      return this.getEnvInfoFromEnvironments(environments);
+      return this.getEnvInfoFromEnvironments(userFlags, environments);
     }
 
     return this.getEnvInfoFromUserChoice(userFlags, environments);
   }
 
   private async getEnvInfoFromEnvironments(
+    userFlags,
     environments: Environments
   ): Promise<EnvironmentInfo[]> {
     const environmentInfoList: EnvironmentInfo[] = [];
@@ -199,7 +214,10 @@ export default class Start extends Command {
           port: environments[envIndex].port
         });
 
-        environmentInfoList.push(environmentInfo);
+        environmentInfoList.push({
+          ...environmentInfo,
+          initialDataDir: getDirname(userFlags.data)
+        });
       } catch (error) {
         this.error(error.message);
       }
@@ -228,7 +246,7 @@ export default class Start extends Command {
       this.error(error.message);
     }
 
-    return [environmentInfo];
+    return [{ ...environmentInfo, initialDataDir: getDirname(userFlags.data) }];
   }
 
   private async validateName(name: string) {

@@ -16,7 +16,9 @@ const logger = createLogger({
   transports: [new logsTransports.Console()]
 });
 
-const argv = minimist<{ data: string }>(process.argv.slice(2));
+const argv = minimist<{ data: string; environmentDir: string }>(
+  process.argv.slice(2)
+);
 
 const addEventListeners = function (
   server: MockoonServer,
@@ -87,7 +89,8 @@ if (argv.data) {
         info: logger.info.bind(logger),
         warn: logger.warn.bind(logger),
         error: logger.error.bind(logger)
-      })
+      }),
+      environmentDirectory: argv.environmentDir
     });
 
     addEventListeners(server, environment);
