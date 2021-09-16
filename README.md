@@ -65,13 +65,15 @@ Two methods are available to run your mocks with the CLI: directly using a Mocko
 
 ### Use a Mockoon environment file (preferred method)
 
-Following Mockoon's changes in version [1.16.0](https://github.com/mockoon/mockoon/releases/tag/v1.16.0) and starting with CLI [v1.2.0](https://github.com/mockoon/cli/releases/tag/v1.2.0), the CLI is directly compatible with Mockoon's environment file, without the need to use the export method (see below).
+Following Mockoon's changes in version [1.16.0](https://github.com/mockoon/mockoon/releases/tag/v1.16.0) and starting with CLI [v1.2.0](https://github.com/mockoon/cli/releases/tag/v1.2.0), the latter is directly compatible with Mockoon's environment files, without the need to use the export method (see below).
 
-You can run your mock in one single step using the [start command](#mockoon-cli-start):
+You can run your mock in one single step using the [start command](#mockoon-cli-start) and replacing `~/path/to/your-environment-file.json` by the actual location of your Mockoon environment file:
 
 ```sh-sessions
 $ mockoon-cli start --data ~/path/to/your-environment-file.json
 ```
+
+> To locate your environment file from the main application, right-click on a environment and select "Show in folder" in the context menu.
 
 ### Use a Mockoon export file
 
