@@ -52,7 +52,7 @@ export default class Dockerize extends Command {
         },
         dockerfilePath.dir
       );
-    } catch (error) {
+    } catch (error: any) {
       this.error(error.message);
     }
     if (!portIsValid(environmentInfo.port)) {
@@ -79,7 +79,7 @@ export default class Dockerize extends Command {
         environmentInfo.port,
         environmentInfo.name
       );
-    } catch (error) {
+    } catch (error: any) {
       this.error(error.message);
     }
   }

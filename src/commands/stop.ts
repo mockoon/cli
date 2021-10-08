@@ -92,7 +92,7 @@ export default class Stop extends Command {
             ProcessListManager.deleteProcess(stoppedProcess.name);
           }
         });
-      } catch (error) {
+      } catch (error: any) {
         if (error.message === 'process name not found' && args.id === 'all') {
           // if 'all' was specified and no process was stopped, do not list and immediately exit
           this.log(Messages.CLI.NO_RUNNING_PROCESS);
@@ -118,7 +118,7 @@ export default class Stop extends Command {
 
       // always clean data files after a stop
       await cleanDataFiles(runningProcesses);
-    } catch (error) {
+    } catch (error: any) {
       this.error(error.message, { exit: false });
     }
 

@@ -96,7 +96,7 @@ if (argv.data) {
     addEventListeners(server, environment);
 
     server.start();
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message);
   }
 }

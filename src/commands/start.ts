@@ -78,7 +78,7 @@ export default class Start extends Command {
 
         await this.runEnvironment(environmentInfo);
       }
-    } catch (error) {
+    } catch (error: any) {
       this.error(error.message);
     } finally {
       ProcessManager.disconnect();
@@ -218,7 +218,7 @@ export default class Start extends Command {
           ...environmentInfo,
           initialDataDir: getDirname(userFlags.data)
         });
-      } catch (error) {
+      } catch (error: any) {
         this.error(error.message);
       }
     }
@@ -242,7 +242,7 @@ export default class Start extends Command {
         hostname: userFlags.hostname,
         pname: userFlags.pname
       });
-    } catch (error) {
+    } catch (error: any) {
       this.error(error.message);
     }
 

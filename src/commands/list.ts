@@ -50,7 +50,7 @@ export default class List extends Command {
             : Messages.CLI.NO_RUNNING_PROCESS
         );
       }
-    } catch (error) {
+    } catch (error: any) {
       this.error(error.message);
     } finally {
       ProcessManager.disconnect();
