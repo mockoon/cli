@@ -47,6 +47,11 @@ export const logProcesses = (processes: ProcessDescription[]): void => {
         minWidth: 7,
         get: (row) =>
           configProcesses.find((data) => data.name === row.name)?.port
+      },
+      endpointPrefix: {
+        minWidth: 25,
+        get: (row) =>
+          configProcesses.find((data) => data.name === row.name)?.endpointPrefix
       }
     },
     {

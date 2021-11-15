@@ -167,12 +167,14 @@ export const prepareData = async (
     port?: number;
     pname?: string;
     hostname?: string;
+    endpointPrefix?: string;
   },
   dockerfileDir?: string
 ): Promise<{
   name: string;
   protocol: string;
   hostname: string;
+  endpointPrefix: string;
   port: number;
   dataFile: string;
 }> => {
@@ -193,6 +195,10 @@ export const prepareData = async (
     environment.hostname = options.hostname;
   }
 
+  if (options.endpointPrefix !== undefined) {
+    environment.endpointPrefix = options.endpointPrefix;
+  }
+
   let dataFile: string = join(Config.dataPath, `${environment.name}.json`);
 
   // if we are building a Dockerfile, we want the data in the same folder
@@ -209,6 +215,7 @@ export const prepareData = async (
     protocol: environment.https ? 'https' : 'http',
     hostname: environment.hostname,
     port: environment.port,
+    endpointPrefix: environment.endpointPrefix,
     dataFile
   };
 };

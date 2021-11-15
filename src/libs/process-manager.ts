@@ -14,6 +14,7 @@ export type ConfigProcess = {
   pid: number;
   port: number;
   hostname: string;
+  endpointPrefix: string;
 };
 
 /**
