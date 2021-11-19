@@ -50,6 +50,7 @@ export const logProcesses = (processes: ProcessDescription[]): void => {
       },
       endpointPrefix: {
         minWidth: 25,
+        header: 'API prefix',
         get: (row) =>
           configProcesses.find((data) => data.name === row.name)?.endpointPrefix
       }
