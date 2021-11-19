@@ -21,6 +21,7 @@ interface EnvironmentInfo {
   protocol: string;
   hostname: string;
   port: number;
+  endpointPrefix: string;
   dataFile: string;
   initialDataDir?: string | null;
 }
@@ -106,6 +107,7 @@ export default class Start extends Command {
       name: environmentInfo.name,
       port: environmentInfo.port,
       hostname: environmentInfo.hostname,
+      endpointPrefix: environmentInfo.endpointPrefix,
       pid: process[0].pm2_env.pm_id
     });
   }
@@ -183,6 +185,7 @@ export default class Start extends Command {
         name: environment.name,
         hostname: environment.hostname,
         port: environment.port,
+        endpointPrefix: environment.endpointPrefix,
         initialDataDir: null
       }
     ];
@@ -211,7 +214,8 @@ export default class Start extends Command {
         const environmentInfo = await prepareData(environments, {
           index: envIndex,
           name: environments[envIndex].name,
-          port: environments[envIndex].port
+          port: environments[envIndex].port,
+          endpointPrefix: environments[envIndex].endpointPrefix
         });
 
         environmentInfoList.push({
@@ -240,6 +244,7 @@ export default class Start extends Command {
         name: userFlags.name,
         port: userFlags.port,
         hostname: userFlags.hostname,
+        endpointPrefix: userFlags.endpointPrefix,
         pname: userFlags.pname
       });
     } catch (error: any) {
