@@ -212,7 +212,7 @@ export const prepareData = async (
 
   return {
     name: environment.name,
-    protocol: environment.https ? 'https' : 'http',
+    protocol: environment.tlsOptions.enabled ? 'https' : 'http',
     hostname: environment.hostname,
     port: environment.port,
     endpointPrefix: environment.endpointPrefix,
