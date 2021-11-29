@@ -50,7 +50,7 @@
   "funding": "https://mockoon.com/sponsor-us/",
   "dependencies": {
     "@mockoon/commons": "2.8.2",
-    "@mockoon/commons-server": "2.15.0",
+    "@mockoon/commons-server": "2.15.1",
     "@oclif/command": "1.8.4",
     "@oclif/config": "1.17.1",
     "@oclif/plugin-help": "3.2.7",
