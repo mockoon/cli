@@ -174,7 +174,7 @@ export default class Start extends Command {
     );
     let protocol = 'http';
 
-    if (environment.https) {
+    if (environment.tlsOptions.enabled) {
       protocol = 'https';
     }
 
