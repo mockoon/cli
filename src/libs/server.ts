@@ -65,7 +65,8 @@ const addEventListeners = function (
     logger.info(
       `${transaction.request.method} ${transaction.request.urlPath} | ${
         transaction.response.statusCode
-      }${transaction.proxied ? ' | proxied' : ''}`
+      }${transaction.proxied ? ' | proxied' : ''}`,
+      { transaction }
     );
   });
 
