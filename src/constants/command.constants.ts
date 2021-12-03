@@ -28,5 +28,9 @@ export const startFlags = {
     char: 'a',
     description: 'Run all environments',
     exclusive: ['name', 'index']
+  }),
+  'log-transaction': flags.boolean({
+    char: 't',
+    description: 'Log the full HTTP transaction (request and response)'
   })
 };

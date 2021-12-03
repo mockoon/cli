@@ -16,9 +16,11 @@ const logger = createLogger({
   transports: [new logsTransports.Console()]
 });
 
-const argv = minimist<{ data: string; environmentDir: string }>(
-  process.argv.slice(2)
-);
+const argv = minimist<{
+  data: string;
+  environmentDir: string;
+  logTransaction?: boolean;
+}>(process.argv.slice(2));
 
 const addEventListeners = function (
   server: MockoonServer,
@@ -65,7 +67,8 @@ const addEventListeners = function (
     logger.info(
       `${transaction.request.method} ${transaction.request.urlPath} | ${
         transaction.response.statusCode
-      }${transaction.proxied ? ' | proxied' : ''}`
+      }${transaction.proxied ? ' | proxied' : ''}`,
+      argv.logTransaction ? { transaction } : {}
     );
   });
 

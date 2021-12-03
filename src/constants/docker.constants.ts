@@ -14,5 +14,5 @@ USER mockoon
 
 EXPOSE {{{port}}}
 
-ENTRYPOINT sh mockoon-runner.sh -d data -c
+ENTRYPOINT sh mockoon-runner.sh -d data -c {{{args}}}
 # Usage: docker run -p <host_port>:<container_port> mockoon-test`;

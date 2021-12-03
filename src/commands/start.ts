@@ -24,6 +24,7 @@ interface EnvironmentInfo {
   endpointPrefix: string;
   dataFile: string;
   initialDataDir?: string | null;
+  logTransaction?: boolean;
 }
 
 export default class Start extends Command {
@@ -134,6 +135,9 @@ export default class Start extends Command {
     if (environmentInfo.initialDataDir) {
       args.push('--environmentDir', environmentInfo.initialDataDir);
     }
+    if (environmentInfo.logTransaction) {
+      args.push('--logTransaction');
+    }
 
     return ProcessManager.start({
       max_restarts: 1,
@@ -186,7 +190,8 @@ export default class Start extends Command {
         hostname: environment.hostname,
         port: environment.port,
         endpointPrefix: environment.endpointPrefix,
-        initialDataDir: null
+        initialDataDir: null,
+        logTransaction: userFlags['log-transaction']
       }
     ];
   }
@@ -220,7 +225,8 @@ export default class Start extends Command {
 
         environmentInfoList.push({
           ...environmentInfo,
-          initialDataDir: getDirname(userFlags.data)
+          initialDataDir: getDirname(userFlags.data),
+          logTransaction: userFlags['log-transaction']
         });
       } catch (error: any) {
         this.error(error.message);
@@ -251,7 +257,13 @@ export default class Start extends Command {
       this.error(error.message);
     }
 
-    return [{ ...environmentInfo, initialDataDir: getDirname(userFlags.data) }];
+    return [
+      {
+        ...environmentInfo,
+        initialDataDir: getDirname(userFlags.data),
+        logTransaction: userFlags['log-transaction']
+      }
+    ];
   }
 
   private async validateName(name: string) {
