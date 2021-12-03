@@ -63,7 +63,8 @@ export default class Dockerize extends Command {
       const dockerFile = mustacheRender(DOCKER_TEMPLATE, {
         port: environmentInfo.port,
         filePath: pathParse(environmentInfo.dataFile).base,
-        version: Config.version
+        version: Config.version,
+        args: userFlags['log-transaction'] ? '--log-transaction' : ''
       });
 
       await mkdirp(dockerfilePath.dir);
