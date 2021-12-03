@@ -68,7 +68,10 @@ export const logProcesses = (processes: ProcessDescription[]): void => {
  */
 export const transformEnvironmentName = (environmentName: string): string =>
   `${processPrefix}${
-    environmentName.trim().toLowerCase().replace(/ /g, '-') || 'mock'
+    environmentName
+      .trim()
+      .toLowerCase()
+      .replace(/[ \/\\]/g, '-') || 'mock'
   }`;
 
 /**
