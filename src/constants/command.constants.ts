@@ -32,5 +32,10 @@ export const startFlags = {
   'log-transaction': flags.boolean({
     char: 't',
     description: 'Log the full HTTP transaction (request and response)'
+  }),
+  repair: flags.boolean({
+    char: 'r',
+    description:
+      'If the data file seems too old, or an invalid Mockoon file, migrate/repair without prompting'
   })
 };

@@ -43,15 +43,16 @@ export default class Dockerize extends Command {
     userFlags = await promptEnvironmentChoice(userFlags, environments);
 
     try {
-      environmentInfo = await prepareData(
+      environmentInfo = await prepareData({
         environments,
-        {
+        options: {
           index: userFlags.index,
           name: userFlags.name,
           port: userFlags.port
         },
-        dockerfilePath.dir
-      );
+        dockerfileDir: dockerfilePath.dir,
+        repair: userFlags.repair
+      });
     } catch (error: any) {
       this.error(error.message);
     }

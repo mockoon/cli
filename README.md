@@ -130,6 +130,7 @@ OPTIONS
   -p, --port=port    Override environment's port
   -l, --hostname=0.0.0.0    Override default listening hostname (0.0.0.0)
   -t, --log-transaction   Log the full HTTP transaction (request and response)
+  -r, --repair    If the data file seems too old, or an invalid Mockoon file, migrate/repair without prompting
   -h, --help         show CLI help
 
 EXAMPLES
@@ -206,6 +207,7 @@ OPTIONS
   -p, --port=port    Override environment's port
   -o, --output       Generated Dockerfile path and name (e.g. `./Dockerfile`)
   -t, --log-transaction   Log the full HTTP transaction (request and response)
+  -r, --repair    If the data file seems too old, or an invalid Mockoon file, migrate/repair without prompting
   -h, --help         show CLI help
 
 EXAMPLES

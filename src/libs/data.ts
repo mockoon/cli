@@ -69,13 +69,14 @@ export const parseDataFile = async (
  */
 const migrateAndValidateEnvironment = async (
   environment: Environment,
-  environmentName: string | undefined
+  environmentName: string | undefined,
+  forceRepair?: boolean
 ) => {
   // environment data are too old: lastMigration is not present
-  if (environment.lastMigration === undefined) {
-    const promptResponse: { load: string } = await prompt([
+  if (environment.lastMigration === undefined && !forceRepair) {
+    const promptResponse: { repair: string } = await prompt([
       {
-        name: 'load',
+        name: 'repair',
         message: `${
           environmentName ? '"' + environmentName + '"' : 'This environment'
         } does not seem to be a valid Mockoon environment or is too old. Load it anyway? (Mockoon CLI will attempt to repair it)`,
@@ -84,7 +85,7 @@ const migrateAndValidateEnvironment = async (
       }
     ]);
 
-    if (!promptResponse.load) {
+    if (!promptResponse.repair) {
       throw new Error(Messages.CLI.DATA_TOO_OLD_ERROR);
     }
   }
@@ -159,8 +160,8 @@ const getEnvironment = (
  * @param environments - path to the data file or export data
  * @param options
  */
-export const prepareData = async (
-  environments: Environments,
+export const prepareData = async (parameters: {
+  environments: Environments;
   options: {
     name?: string;
     index?: number;
@@ -168,9 +169,10 @@ export const prepareData = async (
     pname?: string;
     hostname?: string;
     endpointPrefix?: string;
-  },
-  dockerfileDir?: string
-): Promise<{
+  };
+  dockerfileDir?: string;
+  repair?: boolean;
+}): Promise<{
   name: string;
   protocol: string;
   hostname: string;
@@ -178,33 +180,40 @@ export const prepareData = async (
   port: number;
   dataFile: string;
 }> => {
-  let environment: Environment = getEnvironment(environments, options);
+  let environment: Environment = getEnvironment(
+    parameters.environments,
+    parameters.options
+  );
 
-  environment = await migrateAndValidateEnvironment(environment, options.name);
+  environment = await migrateAndValidateEnvironment(
+    environment,
+    parameters.options.name,
+    parameters.repair
+  );
 
   // transform the provided name or env's name to be used as process name
   environment.name = transformEnvironmentName(
-    options.pname || environment.name
+    parameters.options.pname || environment.name
   );
 
-  if (options.port !== undefined) {
-    environment.port = options.port;
+  if (parameters.options.port !== undefined) {
+    environment.port = parameters.options.port;
   }
 
-  if (options.hostname !== undefined) {
-    environment.hostname = options.hostname;
+  if (parameters.options.hostname !== undefined) {
+    environment.hostname = parameters.options.hostname;
   }
 
-  if (options.endpointPrefix !== undefined) {
-    environment.endpointPrefix = options.endpointPrefix;
+  if (parameters.options.endpointPrefix !== undefined) {
+    environment.endpointPrefix = parameters.options.endpointPrefix;
   }
 
   let dataFile: string = join(Config.dataPath, `${environment.name}.json`);
 
   // if we are building a Dockerfile, we want the data in the same folder
-  if (dockerfileDir) {
-    await mkdirp(dockerfileDir);
-    dataFile = `${dockerfileDir}/${environment.name}.json`;
+  if (parameters.dockerfileDir) {
+    await mkdirp(parameters.dockerfileDir);
+    dataFile = `${parameters.dockerfileDir}/${environment.name}.json`;
   }
 
   // save environment to data path

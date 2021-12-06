@@ -216,11 +216,15 @@ export default class Start extends Command {
 
     for (let envIndex = 0; envIndex < environments.length; envIndex++) {
       try {
-        const environmentInfo = await prepareData(environments, {
-          index: envIndex,
-          name: environments[envIndex].name,
-          port: environments[envIndex].port,
-          endpointPrefix: environments[envIndex].endpointPrefix
+        const environmentInfo = await prepareData({
+          environments,
+          options: {
+            index: envIndex,
+            name: environments[envIndex].name,
+            port: environments[envIndex].port,
+            endpointPrefix: environments[envIndex].endpointPrefix
+          },
+          repair: userFlags.repair
         });
 
         environmentInfoList.push({
@@ -245,13 +249,17 @@ export default class Start extends Command {
     let environmentInfo: EnvironmentInfo;
 
     try {
-      environmentInfo = await prepareData(environments, {
-        index: userFlags.index,
-        name: userFlags.name,
-        port: userFlags.port,
-        hostname: userFlags.hostname,
-        endpointPrefix: userFlags.endpointPrefix,
-        pname: userFlags.pname
+      environmentInfo = await prepareData({
+        environments,
+        options: {
+          index: userFlags.index,
+          name: userFlags.name,
+          port: userFlags.port,
+          hostname: userFlags.hostname,
+          endpointPrefix: userFlags.endpointPrefix,
+          pname: userFlags.pname
+        },
+        repair: userFlags.repair
       });
     } catch (error: any) {
       this.error(error.message);
