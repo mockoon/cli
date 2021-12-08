@@ -1,30 +1,47 @@
 import { Environment, ServerErrorCodes, Transaction } from '@mockoon/commons';
 import { MockoonServer } from '@mockoon/commons-server';
 import { readFileSync as readJSONFileSync } from 'jsonfile';
-import * as minimist from 'minimist';
 import { format } from 'util';
 import {
   createLogger,
   format as logFormat,
+  Logger,
   transports as logsTransports
 } from 'winston';
+import {
+  ConsoleTransportInstance,
+  FileTransportInstance,
+  FileTransportOptions
+} from 'winston/lib/winston/transports';
 import { Messages } from '../constants/messages.constants';
 
-const logger = createLogger({
-  level: 'info',
-  format: logFormat.combine(logFormat.timestamp(), logFormat.json()),
-  transports: [new logsTransports.Console()]
-});
+let logger: Logger;
 
-const argv = minimist<{
-  data: string;
-  environmentDir: string;
-  logTransaction?: boolean;
-}>(process.argv.slice(2));
+const createLoggerInstance = (
+  fileTransportsOptions: FileTransportOptions[] | undefined
+) => {
+  const transportsInstances: (
+    | FileTransportInstance
+    | ConsoleTransportInstance
+  )[] = [new logsTransports.Console()];
+
+  if (fileTransportsOptions?.length) {
+    fileTransportsOptions.forEach((fileTransportOption) => {
+      transportsInstances.push(new logsTransports.File(fileTransportOption));
+    });
+  }
+
+  logger = createLogger({
+    level: 'info',
+    format: logFormat.combine(logFormat.timestamp(), logFormat.json()),
+    transports: transportsInstances
+  });
+};
 
 const addEventListeners = function (
   server: MockoonServer,
-  environment: Environment
+  environment: Environment,
+  logTransaction?: boolean
 ) {
   server.on('started', () => {
     logger.info(format(Messages.SERVER.STARTED, environment.port));
@@ -68,7 +85,7 @@ const addEventListeners = function (
       `${transaction.request.method} ${transaction.request.urlPath} | ${
         transaction.response.statusCode
       }${transaction.proxied ? ' | proxied' : ''}`,
-      argv.logTransaction ? { transaction } : {}
+      logTransaction ? { transaction } : {}
     );
   });
 
@@ -81,9 +98,16 @@ const addEventListeners = function (
   });
 };
 
-if (argv.data) {
+export const createServer = (parameters: {
+  data: string;
+  environmentDir: string;
+  logTransaction?: boolean;
+  fileTransportsOptions?: FileTransportOptions[];
+}): void => {
   try {
-    const environment: Environment = readJSONFileSync(argv.data);
+    createLoggerInstance(parameters.fileTransportsOptions);
+
+    const environment: Environment = readJSONFileSync(parameters.data);
 
     const server = new MockoonServer(environment, {
       logProvider: () => ({
@@ -93,13 +117,13 @@ if (argv.data) {
         warn: logger.warn.bind(logger),
         error: logger.error.bind(logger)
       }),
-      environmentDirectory: argv.environmentDir
+      environmentDirectory: parameters.environmentDir
     });
 
-    addEventListeners(server, environment);
+    addEventListeners(server, environment, parameters.logTransaction);
 
     server.start();
   } catch (error: any) {
     throw new Error(error.message);
   }
-}
+};

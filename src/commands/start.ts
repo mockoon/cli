@@ -9,6 +9,7 @@ import { commonFlags, startFlags } from '../constants/command.constants';
 import { Messages } from '../constants/messages.constants';
 import { parseDataFile, prepareData } from '../libs/data';
 import { ProcessListManager, ProcessManager } from '../libs/process-manager';
+import { createServer } from '../libs/server';
 import {
   getDirname,
   portInUse,
@@ -36,7 +37,9 @@ export default class Start extends Command {
     '$ mockoon-cli start --data https://file-server/data.json --index 0',
     '$ mockoon-cli start --data ~/data.json --name "Mock environment"',
     '$ mockoon-cli start --data ~/data.json --name "Mock environment" --pname "proc1"',
-    '$ mockoon-cli start --data ~/data.json --all'
+    '$ mockoon-cli start --data ~/data.json --all',
+    '$ mockoon-cli start --data ~/data.json --daemon-off',
+    '$ mockoon-cli start --data ~/data.json --log-transaction'
   ];
 
   public static flags = {
@@ -49,6 +52,13 @@ export default class Start extends Command {
     hostname: flags.string({
       char: 'l',
       description: 'Listening hostname/address'
+    }),
+    'daemon-off': flags.boolean({
+      char: 'D',
+      description:
+        'Keep the CLI in the foreground and do not manage the process with PM2',
+      default: false,
+      exclusive: ['all']
     }),
     /**
      * /!\ Undocumented flag.
@@ -78,7 +88,7 @@ export default class Start extends Command {
         await this.validatePort(environmentInfo.port, environmentInfo.hostname);
         await this.validateName(environmentInfo.name);
 
-        await this.runEnvironment(environmentInfo);
+        await this.runEnvironment(environmentInfo, userFlags['daemon-off']);
       }
     } catch (error: any) {
       this.error(error.message);
@@ -87,17 +97,15 @@ export default class Start extends Command {
     }
   }
 
-  private async runEnvironment(environmentInfo: EnvironmentInfo) {
-    const process: Proc = await this.startProcess(environmentInfo);
-
-    if (process[0].pm2_env.status === 'errored') {
-      // if process is errored we want to delete it
-      await this.handleProcessError(environmentInfo.name);
+  private async runEnvironment(
+    environmentInfo: EnvironmentInfo,
+    daemonOff = false
+  ) {
+    if (daemonOff) {
+      this.startForegroundProcess(environmentInfo);
+    } else {
+      await this.startManagedProcess(environmentInfo);
     }
-
-    this.logStartedProcess(environmentInfo, process);
-
-    await this.addProcessToProcessListManager(environmentInfo, process);
   }
 
   private async addProcessToProcessListManager(
@@ -129,7 +137,35 @@ export default class Start extends Command {
     );
   }
 
-  private async startProcess(environmentInfo: EnvironmentInfo): Promise<Proc> {
+  /**
+   * Start the mock server and run it in the same process in the foreground.
+   * We don't use PM2 here to manage the process
+   *
+   * @param environmentInfo
+   * @returns
+   */
+  private startForegroundProcess(environmentInfo: EnvironmentInfo): void {
+    const parameters: Parameters<typeof createServer>[0] = {
+      data: environmentInfo.dataFile,
+      environmentDir: environmentInfo.initialDataDir
+        ? environmentInfo.initialDataDir
+        : '',
+      logTransaction: environmentInfo.logTransaction,
+      fileTransportsOptions: [
+        { filename: join(Config.logsPath, `${environmentInfo.name}-out.log`) }
+      ]
+    };
+
+    createServer(parameters);
+  }
+
+  /**
+   * Start the mock server and manage the process with PM2
+   *
+   * @param environmentInfo
+   * @returns
+   */
+  private async startManagedProcess(environmentInfo: EnvironmentInfo) {
     const args = ['--data', environmentInfo.dataFile];
 
     if (environmentInfo.initialDataDir) {
@@ -139,7 +175,7 @@ export default class Start extends Command {
       args.push('--logTransaction');
     }
 
-    return ProcessManager.start({
+    const process = await ProcessManager.start({
       max_restarts: 1,
       wait_ready: true,
       min_uptime: 10000,
@@ -148,9 +184,18 @@ export default class Start extends Command {
       error: join(Config.logsPath, `${environmentInfo.name}-error.log`),
       output: join(Config.logsPath, `${environmentInfo.name}-out.log`),
       name: environmentInfo.name,
-      script: resolve(__dirname, '../libs/server.js'),
+      script: resolve(__dirname, '../libs/server-start-script.js'),
       exec_mode: 'fork'
     });
+
+    if (process[0].pm2_env.status === 'errored') {
+      // if process is errored we want to delete it
+      await this.handleProcessError(environmentInfo.name);
+    }
+
+    this.logStartedProcess(environmentInfo, process);
+
+    await this.addProcessToProcessListManager(environmentInfo, process);
   }
 
   private async handleProcessError(name: string) {

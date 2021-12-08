@@ -117,21 +117,24 @@ If only one environment is present in the file, you can omit the index, and the 
 
 The process will be created by default with the name and port of the Mockoon's environment. You can override these values by using the `--port` and `--pname` flags.
 
+Using the `--daemon-off` flag will keep the CLI in the foreground. The mock API process will not be [managed by PM2](#pm2). When running as a blocking process, all the logs are sent to both stdout (console) and the [usual files](logs).
+
 ```
 USAGE
   $ mockoon-cli start
 
 OPTIONS
-  -a, --all          Run all environments
-  -d, --data=data    (required) Path or URL to your Mockoon file
-  -i, --index=index  Environment's index in the data file
-  -n, --name=name    Environment name in the data file
-  -N, --pname=pname    Override process name
-  -p, --port=port    Override environment's port
-  -l, --hostname=0.0.0.0    Override default listening hostname (0.0.0.0)
+  -a, --all               Run all environments
+  -d, --data=data         [required] Path or URL to your Mockoon file
+  -i, --index=index       Environment's index in the data file
+  -n, --name=name         Environment name in the data file
+  -N, --pname=pname       Override process name
+  -p, --port=port         Override environment's port
+  -l, --hostname=0.0.0.0  Override default listening hostname (0.0.0.0)
   -t, --log-transaction   Log the full HTTP transaction (request and response)
-  -r, --repair    If the data file seems too old, or an invalid Mockoon file, migrate/repair without prompting
-  -h, --help         show CLI help
+  -r, --repair            If the data file seems too old, or an invalid Mockoon file, migrate/repair without prompting
+  -D, --daemon-off        Keep the CLI in the foreground and do not manage the process with PM2
+  -h, --help     show CLI help
 
 EXAMPLES
   $ mockoon-cli start --data ~/data.json
@@ -139,6 +142,8 @@ EXAMPLES
   $ mockoon-cli start --data https://file-server/data.json --index 0
   $ mockoon-cli start --data ~/data.json --name "Mock environment"
   $ mockoon-cli start --data ~/data.json --name "Mock environment" --pname "proc1"
+  $ mockoon-cli start --data ~/data.json --index 0 --daemon-off
+  $ mockoon-cli start --data ~/data.json --index 0 --log-transaction
   $ mockoon-cli start --data ~/data.json --all
 ```
 
@@ -275,6 +280,8 @@ Logs are located in `~/.mockoon-cli/logs/{mock-name}-[error|out].log`.
 The `error.log` file contains mostly server errors that occur at startup time and prevent the mock API to run (port already in use, etc.). They shouldn't occur that often.
 
 The `out.log` file contains all other log entries (all levels) produced by the running mock server. Most of the errors occurring in Mockoon CLI (or the main application) are not critical and therefore considered as normal output. As an example, if the JSON body from an entering request is erroneous, Mockoon will log a JSON parsing error, but it won't block the normal execution of the application.
+
+When running the CLI with the [`--daemon-off` flag](#mockoon-cli-start), logs are sent to both stdout (console) and the above files.
 
 ## PM2
 
