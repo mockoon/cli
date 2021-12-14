@@ -134,7 +134,7 @@ OPTIONS
   -t, --log-transaction   Log the full HTTP transaction (request and response)
   -r, --repair            If the data file seems too old, or an invalid Mockoon file, migrate/repair without prompting
   -D, --daemon-off        Keep the CLI in the foreground and do not manage the process with PM2
-  -h, --help     show CLI help
+  -h, --help              Show CLI help
 
 EXAMPLES
   $ mockoon-cli start --data ~/data.json
@@ -206,14 +206,14 @@ USAGE
   $ mockoon-cli dockerize
 
 OPTIONS
-  -d, --data=data    (required) Path or URL to your Mockoon file
-  -i, --index=index  Environment's index in the data file
-  -n, --name=name    Environment name in the data file
-  -p, --port=port    Override environment's port
-  -o, --output       Generated Dockerfile path and name (e.g. `./Dockerfile`)
+  -d, --data=data         [required] Path or URL to your Mockoon file
+  -i, --index=index       Environment's index in the data file
+  -n, --name=name         Environment name in the data file
+  -p, --port=port         Override environment's port
+  -o, --output            [required] Generated Dockerfile path and name (e.g. `./Dockerfile`)
   -t, --log-transaction   Log the full HTTP transaction (request and response)
-  -r, --repair    If the data file seems too old, or an invalid Mockoon file, migrate/repair without prompting
-  -h, --help         show CLI help
+  -r, --repair            If the data file seems too old, or an invalid Mockoon file, migrate/repair without prompting
+  -h, --help              Show CLI help
 
 EXAMPLES
   $ mockoon-cli dockerize --data ~/data.json --output ./Dockerfile
@@ -247,15 +247,17 @@ All of `mockoon-cli start` flags (`--port`, `--index`, etc.) must be provided wh
 
 To load the Mockoon data, you can either mount a local data file and pass `mockoon-cli start` flags at the end of the command:
 
-`docker run -d --mount type=bind,source=/home/your-data-file.json,target=/data,readonly -p 3000:3000 mockoon/cli:latest -d data -i 0 -p 3000`
+`docker run -d --mount type=bind,source=/home/your-data-file.json,target=/data,readonly -p 3000:3000 mockoon/cli:latest --data data --index 0 --port 3000`
 
 Or directly pass a URL to the `mockoon-cli start` command, without mounting a local data file:
 
-`docker run -d -p 3000:3000 mockoon/cli:latest -d https://raw.githubusercontent.com/mockoon/mock-samples/main/samples/generate-mock-data.json -i 0 -p 3000`
+`docker run -d -p 3000:3000 mockoon/cli:latest -d https://raw.githubusercontent.com/mockoon/mock-samples/main/samples/generate-mock-data.json --index 0 --port 3000`
+
+Mockoon CLI's logs will be sent to both stdout (console) and the [usual files](#logs).
 
 ### Using the `dockerize` command
 
-You can use the [`dockerize` command](#mockoon-cli-dockerize) to generate a new Dockerfile that will allow you to build a self-contained image. Thus, no Mockoon CLI specific parameters will be needed when running the container.
+You can use the [`dockerize` command](#mockoon-cli-dockerize) to generate a new Dockerfile that will allow you to build a self-contained image. Thus, no Mockoon CLI specific parameters will be needed when running the container. You can still provide arguments at runtime if needed (see the last example).
 
 - Run the `dockerize` command:
 
@@ -272,6 +274,10 @@ You can use the [`dockerize` command](#mockoon-cli-dockerize) to generate a new 
 - Run the container:
 
   `docker run -d -p <host_port>:3000 mockoon-mock1`
+
+- Or run the container with arguments:
+
+  `docker run -d -p <host_port>:3000 mockoon-mock1 --log-transaction`
 
 ## Logs
 

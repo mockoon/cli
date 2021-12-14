@@ -65,7 +65,8 @@ export default class Dockerize extends Command {
         port: environmentInfo.port,
         filePath: pathParse(environmentInfo.dataFile).base,
         version: Config.version,
-        args: userFlags['log-transaction'] ? '--log-transaction' : ''
+        // passing more args to the dockerfile template, only make sense for log transaction yet as other flags are immediately used during the file creation and data preparation
+        args: userFlags['log-transaction'] ? ', "--log-transaction"' : ''
       });
 
       await mkdirp(dockerfilePath.dir);
