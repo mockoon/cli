@@ -23,9 +23,9 @@ describe('Dockerize command', () => {
     ])
     .it('should successfully run the command', (context) => {
       expect(context.stdout).to.contain(
-        'Dockerfile was generated and saved to ./tmp/Dockerfile'
+        'Dockerfile was generated and saved to /home/runner/work/cli/cli/tmp/Dockerfile'
       );
-      expect(context.stdout).to.contain('cd ./tmp');
+      expect(context.stdout).to.contain('cd /home/runner/work/cli/cli/tmp');
       expect(context.stdout).to.contain('docker build -t mockoon-mock1 .');
       expect(context.stdout).to.contain(
         'docker run -d -p 3010:3010 mockoon-mock1'

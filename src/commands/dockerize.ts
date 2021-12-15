@@ -2,7 +2,7 @@ import { Command, flags } from '@oclif/command';
 import { promises as fs } from 'fs';
 import * as mkdirp from 'mkdirp';
 import { render as mustacheRender } from 'mustache';
-import { parse as pathParse, ParsedPath } from 'path';
+import { parse as pathParse, ParsedPath, resolve as pathResolve } from 'path';
 import { format } from 'util';
 import { Config } from '../config';
 import { commonFlags, startFlags } from '../constants/command.constants';
@@ -34,7 +34,8 @@ export default class Dockerize extends Command {
 
   public async run(): Promise<void> {
     let { flags: userFlags } = this.parse(Dockerize);
-    const dockerfilePath: ParsedPath = pathParse(userFlags.output);
+    const resolvedDockerfilePath = pathResolve(userFlags.output);
+    const dockerfilePath: ParsedPath = pathParse(resolvedDockerfilePath);
 
     let environmentInfo: { name: any; port: any; dataFile: string };
 
@@ -71,9 +72,9 @@ export default class Dockerize extends Command {
 
       await mkdirp(dockerfilePath.dir);
 
-      await fs.writeFile(userFlags.output, dockerFile);
+      await fs.writeFile(resolvedDockerfilePath, dockerFile);
 
-      this.log(Messages.CLI.DOCKERIZE_SUCCESS, userFlags.output);
+      this.log(Messages.CLI.DOCKERIZE_SUCCESS, resolvedDockerfilePath);
       this.log(
         Messages.CLI.DOCKERIZE_BUILD_COMMAND,
         dockerfilePath.dir,
