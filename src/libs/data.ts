@@ -32,7 +32,9 @@ export const parseDataFile = async (
   if (filePath.indexOf('http') !== 0) {
     loadedData = await readJSONFile(filePath, 'utf-8');
   } else {
-    const { data: responseData } = await axios.get(filePath, { timeout: 5000 });
+    const { data: responseData } = await axios.get(filePath, {
+      timeout: 10000
+    });
 
     loadedData =
       typeof responseData === 'string'
@@ -79,7 +81,7 @@ const migrateAndValidateEnvironment = async (
         name: 'repair',
         message: `${
           environmentName ? '"' + environmentName + '"' : 'This environment'
-        } does not seem to be a valid Mockoon environment or is too old. Load it anyway? (Mockoon CLI will attempt to repair it)`,
+        } does not seem to be a valid Mockoon environment or is too old. Let Mockoon attempt to repair it?`,
         type: 'confirm',
         default: true
       }
