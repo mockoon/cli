@@ -33,7 +33,7 @@ export const parseDataFile = async (
     loadedData = await readJSONFile(filePath, 'utf-8');
   } else {
     const { data: responseData } = await axios.get(filePath, {
-      timeout: 10000
+      timeout: 30000
     });
 
     loadedData =
