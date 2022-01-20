@@ -289,6 +289,44 @@ The `out.log` file contains all other log entries (all levels) produced by the r
 
 When running the CLI with the [`--daemon-off` flag](#mockoon-cli-start), logs are sent to both stdout (console) and the above files.
 
+When using the `--log-transaction` flag, logs will contain the full transaction (request and response) with the same information you can see in the desktop application.
+
+Example:
+
+```json
+{
+  "level": "info",
+  "message": "GET /api/test | 200",
+  "timestamp": "2021-12-08T14:50:05.004Z",
+  "transaction": {
+    "proxied": false,
+    "request": {
+      "body": "",
+      "headers": [
+        { "key": "accept", "value": "application/json, text/plain, */*" }
+      ],
+      "method": "GET",
+      "params": [],
+      "queryParams": [],
+      "route": "/api/test",
+      "urlPath": "/api/test"
+    },
+    "response": {
+      "body": "response",
+      "headers": [
+        { "key": "content-length", "value": "8" },
+        { "key": "content-type", "value": "application/json; charset=utf-8" }
+      ],
+      "statusCode": 200
+    },
+    "routeResponseUUID": "b1ba948f-82b3-4cc2-8067-692e562319ab",
+    "routeUUID": "304a761f-351d-415a-bf59-6e927322ae63"
+  }
+}
+```
+
+The `transaction` model can be found [here](https://github.com/mockoon/commons/blob/main/src/models/server.model.ts#L26-L44).
+
 ## PM2
 
 Mockoon CLI uses [PM2](https://pm2.keymetrics.io/) to start, stop or list the running mock APIs. Therefore, you can directly use PM2 commands to manage the processes.
