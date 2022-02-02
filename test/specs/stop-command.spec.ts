@@ -2,12 +2,10 @@ import { test } from '@oclif/test';
 import { expect } from 'chai';
 import { stopProcesses } from '../libs/helpers';
 
-const sampleDataPath = './test/data/sample-data.json';
-
 describe('Stop running mock by pid', () => {
   test
     .stdout()
-    .command(['start', '--data', sampleDataPath, '-i', '0'])
+    .command(['start', '--data', './test/data/envs/mock1.json'])
     .it('should start first mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
         'Mock started at http://localhost:3000 (pid: 0, name: mockoon-mock1)'
@@ -20,7 +18,7 @@ describe('Stop running mock by pid', () => {
 describe('Stop running mock by name', () => {
   test
     .stdout()
-    .command(['start', '--data', sampleDataPath, '-i', '0'])
+    .command(['start', '--data', './test/data/envs/mock1.json'])
     .it('should start first mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
         'Mock started at http://localhost:3000 (pid: 0, name: mockoon-mock1)'
@@ -33,7 +31,7 @@ describe('Stop running mock by name', () => {
 describe('Stop all running mocks', () => {
   test
     .stdout()
-    .command(['start', '--data', sampleDataPath, '-i', '0'])
+    .command(['start', '--data', './test/data/envs/mock1.json'])
     .it('should start first mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
         'Mock started at http://localhost:3000 (pid: 0, name: mockoon-mock1)'
@@ -42,7 +40,13 @@ describe('Stop all running mocks', () => {
 
   test
     .stdout()
-    .command(['start', '--data', sampleDataPath, '-i', '1', '--port', '3001'])
+    .command([
+      'start',
+      '--data',
+      './test/data/envs/mock2.json',
+      '--port',
+      '3001'
+    ])
     .it('should start second mock on port 3001', (context) => {
       expect(context.stdout).to.contain(
         'Mock started at http://localhost:3001 (pid: 1, name: mockoon-mock2)'
@@ -84,7 +88,7 @@ describe('Stop when no mock is running and name arg', () => {
 describe('Stop with wrong arg and list', () => {
   test
     .stdout()
-    .command(['start', '--data', sampleDataPath, '-i', '0'])
+    .command(['start', '--data', './test/data/envs/mock1.json'])
     .it('should start first mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
         'Mock started at http://localhost:3000 (pid: 0, name: mockoon-mock1)'

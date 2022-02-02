@@ -2,9 +2,11 @@ import {
   Environment,
   Environments,
   EnvironmentSchema,
-  Export,
   HighestMigrationId,
-  Migrations
+  IsLegacyExportData,
+  LegacyExport,
+  Migrations,
+  UnwrapLegacyExport
 } from '@mockoon/commons';
 import axios from 'axios';
 import { promises as fs } from 'fs';
@@ -20,14 +22,14 @@ import { transformEnvironmentName } from './utils';
 
 /**
  * Load and parse a JSON data file.
- * Supports both export files (with one or multiple envs) or new environment files.
+ * Supports both legacy export files (with one or multiple envs) or new environment files.
  *
  * @param filePath
  */
 export const parseDataFile = async (
   filePath: string
 ): Promise<Environments> => {
-  let loadedData: Export | Environment;
+  let loadedData: LegacyExport | Environment;
 
   if (filePath.indexOf('http') !== 0) {
     loadedData = await readJSONFile(filePath, 'utf-8');
@@ -41,16 +43,12 @@ export const parseDataFile = async (
         ? JSON.parse(responseData)
         : responseData;
   }
-  const environments: Environments = [];
+  let environments: Environments = [];
 
-  // we have an export file
-  if ('source' in loadedData && 'data' in loadedData) {
+  // we have a legacy export file
+  if (IsLegacyExportData(loadedData)) {
     // Extract all environments, eventually filter items of type 'route'
-    loadedData.data.forEach((dataItem) => {
-      if (dataItem.type === 'environment') {
-        environments.push(dataItem.item);
-      }
-    });
+    environments = UnwrapLegacyExport(loadedData);
   } else if (typeof loadedData === 'object') {
     environments.push(loadedData);
   }

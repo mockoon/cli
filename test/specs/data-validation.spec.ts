@@ -21,7 +21,7 @@ describe('Data validation', () => {
       .do(() => {
         inquirerMock({ repair: false });
       })
-      .command(['start', '--data', './test/data/env-to-repair.json', '-i', '0'])
+      .command(['start', '--data', './test/data/envs/repair.json'])
       .catch((context) => {
         expect(context.message).to.contain(
           "These environment's data are too old or not a valid Mockoon environment."
@@ -36,7 +36,7 @@ describe('Data validation', () => {
       .do(() => {
         inquirerMock({ repair: true });
       })
-      .command(['start', '--data', './test/data/env-to-repair.json', '-i', '0'])
+      .command(['start', '--data', './test/data/envs/repair.json'])
       .it(
         'should repair and start mock on port 3000 if repair is accepted',
         (context) => {
@@ -58,14 +58,7 @@ describe('Data validation', () => {
   describe('Repair forced with flag', () => {
     test
       .stdout()
-      .command([
-        'start',
-        '--data',
-        './test/data/env-to-repair.json',
-        '-i',
-        '0',
-        '--repair'
-      ])
+      .command(['start', '--data', './test/data/envs/repair.json', '--repair'])
       .it(
         'should repair and start mock on port 3000 if repair was forced with the flag',
         (context) => {

@@ -17,9 +17,7 @@ export default class Dockerize extends Command {
 
   public static examples = [
     '$ mockoon-cli dockerize --data ~/data.json --output ./Dockerfile',
-    '$ mockoon-cli dockerize --data ~/data.json --index 0 --output ./Dockerfile',
-    '$ mockoon-cli dockerize --data https://file-server/data.json --index 0 --output ./Dockerfile',
-    '$ mockoon-cli dockerize --data ~/data.json --name "Mock environment" --output ./Dockerfile'
+    '$ mockoon-cli dockerize --data https://file-server/data.json --output ./Dockerfile'
   ];
 
   public static flags = {

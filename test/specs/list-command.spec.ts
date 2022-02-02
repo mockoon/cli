@@ -2,8 +2,6 @@ import { test } from '@oclif/test';
 import { expect } from 'chai';
 import { stopProcesses } from '../libs/helpers';
 
-const sampleDataPath = './test/data/sample-data.json';
-
 describe('List no running process', () => {
   test
     .stdout()
@@ -27,7 +25,7 @@ describe('List cannot get info for unexisting process', () => {
 describe('List one process', () => {
   test
     .stdout()
-    .command(['start', '--data', sampleDataPath, '-i', '0', '-p', '5001'])
+    .command(['start', '--data', './test/data/envs/mock1.json', '-p', '5001'])
     .it('should start process on port 5001', (context) => {
       expect(context.stdout).to.contain(
         'Mock started at http://localhost:5001 (pid: 0, name: mockoon-mock1)'
@@ -48,7 +46,7 @@ describe('List one process', () => {
 describe('List two processes', () => {
   test
     .stdout()
-    .command(['start', '--data', sampleDataPath, '-i', '0', '-p', '5001'])
+    .command(['start', '--data', './test/data/envs/mock1.json', '-p', '5001'])
     .it('should start process on port 5001', (context) => {
       expect(context.stdout).to.contain(
         'Mock started at http://localhost:5001 (pid: 0, name: mockoon-mock1)'
@@ -57,7 +55,7 @@ describe('List two processes', () => {
 
   test
     .stdout()
-    .command(['start', '--data', sampleDataPath, '-i', '1', '-p', '5002'])
+    .command(['start', '--data', './test/data/envs/mock2.json', '-p', '5002'])
     .it('should start process on port 5002', (context) => {
       expect(context.stdout).to.contain(
         'Mock started at http://localhost:5002 (pid: 1, name: mockoon-mock2)'
@@ -80,7 +78,7 @@ describe('List two processes', () => {
 describe('List one of two processes, by name', () => {
   test
     .stdout()
-    .command(['start', '--data', sampleDataPath, '-i', '0', '-p', '5001'])
+    .command(['start', '--data', './test/data/envs/mock1.json', '-p', '5001'])
     .it('should start process on port 5001', (context) => {
       expect(context.stdout).to.contain(
         'Mock started at http://localhost:5001 (pid: 0, name: mockoon-mock1)'
@@ -89,7 +87,7 @@ describe('List one of two processes, by name', () => {
 
   test
     .stdout()
-    .command(['start', '--data', sampleDataPath, '-i', '1', '-p', '5002'])
+    .command(['start', '--data', './test/data/envs/mock2.json', '-p', '5002'])
     .it('should start process on port 5002', (context) => {
       expect(context.stdout).to.contain(
         'Mock started at http://localhost:5002 (pid: 1, name: mockoon-mock2)'
@@ -110,7 +108,7 @@ describe('List one of two processes, by name', () => {
 describe('List one of two processes, by id', () => {
   test
     .stdout()
-    .command(['start', '--data', sampleDataPath, '-i', '0', '-p', '5001'])
+    .command(['start', '--data', './test/data/envs/mock1.json', '-p', '5001'])
     .it('should start process on port 5001', (context) => {
       expect(context.stdout).to.contain(
         'Mock started at http://localhost:5001 (pid: 0, name: mockoon-mock1)'
@@ -119,7 +117,7 @@ describe('List one of two processes, by id', () => {
 
   test
     .stdout()
-    .command(['start', '--data', sampleDataPath, '-i', '1', '-p', '5002'])
+    .command(['start', '--data', './test/data/envs/mock2.json', '-p', '5002'])
     .it('should start process on port 5002', (context) => {
       expect(context.stdout).to.contain(
         'Mock started at http://localhost:5002 (pid: 1, name: mockoon-mock2)'

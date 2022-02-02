@@ -10,4 +10,4 @@ USER mockoon
 
 ENTRYPOINT ["mockoon-cli", "start", "--hostname", "0.0.0.0", "--daemon-off"]
 
-# Usage: docker run --mount type=bind,source="$(pwd)"/dataFile.json,target=/data,readonly -p <port>:<port> mockoon-test -d data -n <env_name>
+# Usage: docker run --mount type=bind,source="$(pwd)"/dataFile.json,target=/data,readonly -p <port>:<port> mockoon-test -d data

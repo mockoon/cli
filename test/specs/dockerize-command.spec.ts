@@ -5,17 +5,13 @@ import { promises as fs } from 'fs';
 import { readFile as readJSONFile } from 'jsonfile';
 import { Config } from '../../src/config';
 
-const sampleDataPath = './test/data/sample-data.json';
-
 describe('Dockerize command', () => {
   test
     .stdout()
     .command([
       'dockerize',
       '--data',
-      sampleDataPath,
-      '--index',
-      '0',
+      './test/data/envs/mock1.json',
       '--port',
       '3010',
       '--output',

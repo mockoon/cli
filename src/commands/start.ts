@@ -33,11 +33,8 @@ export default class Start extends Command {
 
   public static examples = [
     '$ mockoon-cli start --data ~/data.json',
-    '$ mockoon-cli start --data ~/data.json --index 0',
-    '$ mockoon-cli start --data https://file-server/data.json --index 0',
-    '$ mockoon-cli start --data ~/data.json --name "Mock environment"',
-    '$ mockoon-cli start --data ~/data.json --name "Mock environment" --pname "proc1"',
-    '$ mockoon-cli start --data ~/data.json --all',
+    '$ mockoon-cli start --data https://file-server/data.json',
+    '$ mockoon-cli start --data ~/data.json --pname "proc1"',
     '$ mockoon-cli start --data ~/data.json --daemon-off',
     '$ mockoon-cli start --data ~/data.json --log-transaction'
   ];

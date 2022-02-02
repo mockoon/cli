@@ -3,12 +3,10 @@ import axios from 'axios';
 import { expect } from 'chai';
 import { stopProcesses } from '../libs/helpers';
 
-const sampleDataPath = './test/data/environment.json';
-
 describe('Relative file path', () => {
   test
     .stdout()
-    .command(['start', '--data', sampleDataPath])
+    .command(['start', '--data', './test/data/envs/file.json'])
     .it('should start mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
         'Mock started at http://localhost:3000 (pid: 0, name: mockoon-environment-file)'

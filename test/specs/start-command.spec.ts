@@ -1,8 +1,6 @@
 import { test } from '@oclif/test';
 import { expect } from 'chai';
 
-const sampleDataPath = './test/data/sample-data.json';
-
 describe('Start command', () => {
   test
     .stderr()
@@ -15,7 +13,13 @@ describe('Start command', () => {
 
   test
     .stderr()
-    .command(['start', '--data', sampleDataPath, '-i', '0', '--port', '999999'])
+    .command([
+      'start',
+      '--data',
+      './test/data/envs/mock1.json',
+      '--port',
+      '999999'
+    ])
     .catch((context) => {
       expect(context.message).to.contain('Port "999999" is invalid');
     })

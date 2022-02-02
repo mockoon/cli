@@ -6,7 +6,6 @@ import { EOL } from 'os';
 import { Config } from '../../src/config';
 import { delay, stopProcesses } from '../libs/helpers';
 
-const sampleDataPath = './test/data/sample-data.json';
 const logsFilePath = `${Config.logsPath}mockoon-logging-test-out.log`;
 const cleanLogs = () => {
   if (existsSync(logsFilePath)) {
@@ -28,11 +27,9 @@ describe('Logging: basic logging', () => {
     .command([
       'start',
       '--data',
-      sampleDataPath,
+      './test/data/envs/mock1.json',
       '--pname',
-      'logging-test',
-      '-i',
-      '0'
+      'logging-test'
     ])
     .it('should start mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
@@ -65,11 +62,9 @@ describe('Logging: with transaction logs', () => {
     .command([
       'start',
       '--data',
-      sampleDataPath,
+      './test/data/envs/mock1.json',
       '--pname',
       'logging-test',
-      '-i',
-      '0',
       '--log-transaction'
     ])
     .it('should start mock on port 3000', (context) => {

@@ -8,31 +8,6 @@
   "hostname": "0.0.0.0",
   "routes": [
     {
-      "uuid": "11c5e96f-3316-4ed4-b7ef-8d6919be616f",
-      "documentation": "",
-      "method": "get",
-      "endpoint": "users",
-      "responses": [
-        {
-          "uuid": "2a14bca7-6236-48ec-b8cc-79510d75ea9e",
-          "body": "ok",
-          "latency": 0,
-          "statusCode": 200,
-          "label": "",
-          "headers": [],
-          "filePath": "",
-          "sendFileAsBody": false,
-          "rules": [],
-          "rulesOperator": "OR",
-          "disableTemplating": false,
-          "fallbackTo404": false
-        }
-      ],
-      "enabled": true,
-      "randomResponse": false,
-      "sequentialResponse": false
-    },
-    {
       "uuid": "e15f2c20-92aa-4390-8f83-2da2473b47ee",
       "documentation": "",
       "method": "get",
@@ -45,7 +20,7 @@
           "statusCode": 200,
           "label": "",
           "headers": [],
-          "filePath": "./body-files/file1.txt",
+          "filePath": "../body-files/file1.txt",
           "sendFileAsBody": true,
           "rules": [],
           "rulesOperator": "OR",
