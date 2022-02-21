@@ -1,4 +1,9 @@
-import { Environment, ServerErrorCodes, Transaction } from '@mockoon/commons';
+import {
+  Environment,
+  Methods,
+  ServerErrorCodes,
+  Transaction
+} from '@mockoon/commons';
 import { MockoonServer } from '@mockoon/commons-server';
 import { readFileSync as readJSONFileSync } from 'jsonfile';
 import { format } from 'util';
@@ -81,10 +86,15 @@ const addEventListeners = function (
   });
 
   server.on('transaction-complete', (transaction: Transaction) => {
+    transaction.request.method =
+      transaction.request.method.toUpperCase() as keyof typeof Methods;
+
     logger.info(
-      `${transaction.request.method} ${transaction.request.urlPath} | ${
-        transaction.response.statusCode
-      }${transaction.proxied ? ' | proxied' : ''}`,
+      `${transaction.request.method.toUpperCase()} ${
+        transaction.request.urlPath
+      } | ${transaction.response.statusCode}${
+        transaction.proxied ? ' | proxied' : ''
+      }`,
       logTransaction ? { transaction } : {}
     );
   });
