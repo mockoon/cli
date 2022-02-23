@@ -4,14 +4,13 @@ import {
   EnvironmentSchema,
   HighestMigrationId,
   IsLegacyExportData,
-  LegacyExport,
   Migrations,
   UnwrapLegacyExport
 } from '@mockoon/commons';
+import { OpenAPIConverter } from '@mockoon/commons-server';
 import axios from 'axios';
 import { promises as fs } from 'fs';
 import { prompt } from 'inquirer';
-import { readFile as readJSONFile } from 'jsonfile';
 import * as mkdirp from 'mkdirp';
 import { join } from 'path';
 import { ProcessDescription } from 'pm2';
@@ -29,28 +28,38 @@ import { transformEnvironmentName } from './utils';
 export const parseDataFile = async (
   filePath: string
 ): Promise<Environments> => {
-  let loadedData: LegacyExport | Environment;
-
-  if (filePath.indexOf('http') !== 0) {
-    loadedData = await readJSONFile(filePath, 'utf-8');
-  } else {
-    const { data: responseData } = await axios.get(filePath, {
-      timeout: 30000
-    });
-
-    loadedData =
-      typeof responseData === 'string'
-        ? JSON.parse(responseData)
-        : responseData;
-  }
+  const openAPIConverter = new OpenAPIConverter();
   let environments: Environments = [];
 
-  // we have a legacy export file
-  if (IsLegacyExportData(loadedData)) {
-    // Extract all environments, eventually filter items of type 'route'
-    environments = UnwrapLegacyExport(loadedData);
-  } else if (typeof loadedData === 'object') {
-    environments.push(loadedData);
+  try {
+    const environment = await openAPIConverter.convertFromOpenAPI(filePath);
+
+    if (environment) {
+      environments.push(environment);
+    }
+  } catch (openAPIError: any) {
+    try {
+      let data: any;
+
+      if (filePath.startsWith('http')) {
+        data = (await axios.get(filePath, { timeout: 30000 })).data;
+      } else {
+        data = await fs.readFile(filePath, { encoding: 'utf-8' });
+      }
+
+      if (typeof data === 'string') {
+        data = JSON.parse(data);
+      }
+
+      if (IsLegacyExportData(data)) {
+        // Extract all environments, eventually filter items of type 'route'
+        environments = UnwrapLegacyExport(data);
+      } else if (typeof data === 'object') {
+        environments.push(data);
+      }
+    } catch (JSONError: any) {
+      throw new Error(`${Messages.CLI.DATA_INVALID}: ${JSONError.message}`);
+    }
   }
 
   if (environments.length === 0) {

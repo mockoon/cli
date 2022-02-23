@@ -7,11 +7,9 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}\\dist\\app.js",
-      "outFiles": ["${workspaceFolder}/**/*.js"],
-      "args": ["--config", "src/export-mockoon.json", "--name", "mock12"]
+      "name": "Debug CLI",
+      "program": "${workspaceFolder}/bin/run",
+      "args": ["start", "-d", "./test.json"]
     }
   ]
 }

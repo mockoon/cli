@@ -78,9 +78,9 @@ export default class Start extends Command {
   public async run(): Promise<void> {
     const { flags: userFlags } = this.parse(Start);
 
-    const environmentInfoList = await this.getEnvironmentInfoList(userFlags);
-
     try {
+      const environmentInfoList = await this.getEnvironmentInfoList(userFlags);
+
       for (const environmentInfo of environmentInfoList) {
         await this.validatePort(environmentInfo.port, environmentInfo.hostname);
         await this.validateName(environmentInfo.name);

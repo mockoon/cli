@@ -6,7 +6,9 @@ describe('Data loading', () => {
     .stderr()
     .command(['start', '--data', './non-existing-file.json'])
     .catch((context) => {
-      expect(context.message).to.contain('ENOENT: no such file or directory');
+      expect(context.message).to.contain(
+        'This file is not a valid OpenAPI specification (JSON or YAML v2.0.0 and v3.0.0) or Mockoon environment: ENOENT: no such file or directory'
+      );
     })
     .it('should fail when data file cannot be found');
 
@@ -15,7 +17,7 @@ describe('Data loading', () => {
     .command(['start', '--data', 'https://example.org'])
     .catch((context) => {
       expect(context.message).to.contain(
-        'Unexpected token < in JSON at position'
+        'This file is not a valid OpenAPI specification (JSON or YAML v2.0.0 and v3.0.0) or Mockoon environment: Unexpected token < in JSON at position 0'
       );
     })
     .it('should fail when the response is no valid JSON');
@@ -41,14 +43,6 @@ describe('Data loading', () => {
       expect(contains).to.eql(true);
     })
     .it('should fail when the address cannot be found');
-
-  test
-    .stderr()
-    .command(['start', '--data', 'https://www.google.com:81'])
-    .catch((context) => {
-      expect(context.message).to.contain('timeout');
-    })
-    .it('should fail when there is no response');
 
   test
     .stderr()

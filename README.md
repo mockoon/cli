@@ -16,14 +16,16 @@
 </div>
 
 Welcome to Mockoon's official CLI, a lightweight and fast NPM package to deploy your mock APIs anywhere.
-Feed it with a Mockoon's [data file](https://mockoon.com/docs/latest/mockoon-data-files/data-storage-location/), and you are good to go.
+Feed it with a Mockoon's [data file](https://mockoon.com/docs/latest/mockoon-data-files/data-storage-location/), or OpenAPI specification file (JSON or YAML), and you are good to go.
 
 The CLI supports the same features as the main application: [templating system](https://mockoon.com/docs/latest/templating/overview/), [proxy mode](https://mockoon.com/docs/latest/proxy-mode/), [route response rules](https://mockoon.com/docs/latest/route-responses/dynamic-rules/), etc.
 
 ![Mockoon CLI screenshot](./docs/screenshot.png)
 
 - [Installation](#installation)
-- [Use your mocks in the CLI](#use-your-mocks-in-the-cli)
+- [Run a mock API with the CLI](#run-a-mock-api-with-the-cli)
+  - [Use your Mockoon environment file](#use-your-mockoon-environment-file)
+  - [Use an OpenAPI specification file](#use-an-openapi-specification-file)
 - [Compatibility](#compatibility)
 - [Commands](#commands)
   - [`mockoon-cli start`](#mockoon-cli-start)
@@ -54,9 +56,10 @@ Usage:
 $ mockoon-cli COMMAND
 ```
 
-## Use your mocks in the CLI
+## Run a mock API with the CLI
 
-The CLI currently supports only data files in Mockoon's format.
+### Use your Mockoon environment file
+
 The CLI can import and migrate data from older versions of Mockoon. However, it doesn't alter the file you provide and only migrates a copy. If you created your mock with a more recent version of the application, you need to update your CLI with the following command: `npm install -g @mockoon/cli`.
 
 You can run your mock in one single step using the [start command](#mockoon-cli-start) and replacing `~/path/to/your-environment-file.json` by the actual location of your Mockoon environment file:
@@ -68,9 +71,31 @@ $ mockoon-cli start --data ~/path/to/your-environment-file.json
 > To locate your environment file from the main application, right-click on a environment and select "Show in folder" in the context menu:
 > ![context menu - show in folder](/docs/environment-show-in-folder.png)
 
+You can also directly load Mockoon's environment file from a URL. To do so, provide the URL as the `data` parameter instead of a local path:
+
+```sh-sessions
+$ mockoon-cli start --data https://domain.com/your-environment-file.json
+```
+
 > **Use a legacy export file**
 >
 > While we recommend using the method above to launch your mocks with the CLI, you can still use Mockoon's [legacy export files](https://mockoon.com/docs/latest/mockoon-data-files/import-export-mockoon-format/) and the dedicated flags `--index`, `--name` or `--all`.
+
+### Use an OpenAPI specification file
+
+Another option is to directly pass an OpenAPI specification file as the `data` parameter. Mockoon supports both JSON and YAML formats in versions 2.0.0 and 3.0.0.
+
+You can provide a path to a local OpenAPI specification file or directly the file's URL:
+
+```sh-sessions
+$ mockoon-cli start --data ~/path/to/your-opeanapi-file.yaml
+```
+
+Or,
+
+```sh-sessions
+$ mockoon-cli start --data https://domain.com/your-opeanapi-file.yaml
+```
 
 ## Compatibility
 
