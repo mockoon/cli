@@ -298,7 +298,6 @@ export default class Start extends Command {
           name: userFlags.name,
           port: userFlags.port,
           hostname: userFlags.hostname,
-          endpointPrefix: userFlags.endpointPrefix,
           pname: userFlags.pname
         },
         repair: userFlags.repair
