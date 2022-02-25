@@ -24,40 +24,39 @@ describe('Run two mocks on the same port', () => {
   stopProcesses('all', ['mockoon-mock1']);
 });
 
-describe('Run two mocks on different port', () => {
-  test
-    .stdout()
-    .command(['start', '--data', './test/data/envs/mock1.json'])
-    .it('should start first mock on port 3000', (context) => {
-      expect(context.stdout).to.contain(
-        'Mock started at http://localhost:3000 (pid: 0, name: mockoon-mock1)'
-      );
-    });
-
+describe('Run two mocks on different ports, with different process names', () => {
   test
     .stdout()
     .command([
       'start',
       '--data',
+      './test/data/envs/mock1.json',
       './test/data/envs/mock2.json',
       '--port',
-      '3001'
+      '3005',
+      '3006',
+      '--pname',
+      'pname1',
+      'pname2'
     ])
-    .it('should start second mock on port 3001', (context) => {
+    .it('should start first mock on port 3000', (context) => {
       expect(context.stdout).to.contain(
-        'Mock started at http://localhost:3001 (pid: 1, name: mockoon-mock2)'
+        'Mock started at http://localhost:3005 (pid: 0, name: mockoon-pname1)'
+      );
+      expect(context.stdout).to.contain(
+        'Mock started at http://localhost:3006 (pid: 1, name: mockoon-pname2)'
       );
     });
 
   test.it('should call GET /api/test endpoint and get a result', async () => {
-    const call1 = await axios.get('http://localhost:3000/api/test');
-    const call2 = await axios.get('http://localhost:3001/api/test');
+    const call1 = await axios.get('http://localhost:3005/api/test');
+    const call2 = await axios.get('http://localhost:3006/api/test');
 
     expect(call1.data).to.contain('mock-content-1');
     expect(call2.data).to.contain('mock-content-2');
   });
 
-  stopProcesses('all', ['mockoon-mock1', 'mockoon-mock2']);
+  stopProcesses('all', ['mockoon-pname1', 'mockoon-pname2']);
 });
 
 describe('Run two mocks with same name', () => {

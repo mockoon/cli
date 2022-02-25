@@ -6,13 +6,7 @@ import { stopProcesses } from '../libs/helpers';
 describe('Legacy export file', () => {
   test
     .stderr()
-    .command([
-      'start',
-      '--data',
-      './test/data/legacy-export-file/empty.json',
-      '-i',
-      '0'
-    ])
+    .command(['start', '--data', './test/data/legacy-export-file/empty.json'])
     .catch((context) => {
       expect(context.message).to.contain(
         'No environments exist in specified file'
@@ -21,43 +15,8 @@ describe('Legacy export file', () => {
     .it('should fail when file contains no environment');
 
   test
-    .stderr()
-    .command([
-      'start',
-      '--data',
-      './test/data/legacy-export-file/export.json',
-      '-i',
-      '99'
-    ])
-    .catch((context) => {
-      expect(context.message).to.contain('Environment not found at index "99"');
-    })
-    .it('should fail when there is no environment at index');
-
-  test
-    .stderr()
-    .command([
-      'start',
-      '--data',
-      './test/data/legacy-export-file/export.json',
-      '-n',
-      'non-existing-environment-name'
-    ])
-    .catch((context) => {
-      expect(context.message).to.contain(
-        'Environment with name "non-existing-environment-name" cannot be found'
-      );
-    })
-    .it('should fail when there is no environment with requested name');
-
-  test
     .stdout()
-    .command([
-      'start',
-      '--all',
-      '--data',
-      './test/data/legacy-export-file/multi.json'
-    ])
+    .command(['start', '--data', './test/data/legacy-export-file/multi.json'])
     .it('should start all envs', (context) => {
       expect(context.stdout).to.contain(
         'Mock started at http://localhost:3000 (pid: 0, name: mockoon-env0-mock0)'

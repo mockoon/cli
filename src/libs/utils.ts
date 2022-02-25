@@ -1,6 +1,4 @@
-import { Environments } from '@mockoon/commons';
 import { cli } from 'cli-ux';
-import { prompt } from 'inquirer';
 import * as isPortReachable from 'is-port-reachable';
 import { dirname } from 'path';
 import { ProcessDescription } from 'pm2';
@@ -98,43 +96,6 @@ export const portInUse = async (
  * @param port
  */
 export const portIsValid = (port: number): boolean => port >= 0 && port < 65536;
-
-/**
- * Check if --index or --name flag are provided and
- * prompt user to choose an environment if not.
- * If there is only one environment, launch it by default
- *
- * @param flags
- * @param environments
- */
-export const promptEnvironmentChoice = async <
-  T extends { index: number | undefined; name: string | undefined }
->(
-  flags: T,
-  environments: Environments
-): Promise<T> => {
-  if (flags.index === undefined && !flags.name) {
-    if (environments.length === 1) {
-      flags.index = 0;
-    } else {
-      const response: { environmentIndex: number } = await prompt([
-        {
-          name: 'environmentIndex',
-          message: 'Please select an environment',
-          type: 'list',
-          choices: environments.map((environment, environmentIndex) => ({
-            name: environment.name || environmentIndex,
-            value: environmentIndex
-          }))
-        }
-      ]);
-
-      flags.index = response.environmentIndex;
-    }
-  }
-
-  return flags;
-};
 
 /**
  * Get the path directory, except if it's a URL.

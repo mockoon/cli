@@ -7,13 +7,15 @@ export const commonFlags = {
 export const startFlags = {
   data: flags.string({
     char: 'd',
-    description: 'Path or URL to your Mockoon data file',
-    required: true
+    description: 'Path(s) or URL(s) to your Mockoon data file(s)',
+    required: true,
+    multiple: true
   }),
-
   port: flags.integer({
     char: 'p',
-    description: "Override environment's port"
+    description: 'Override environment(s) port(s)',
+    multiple: true,
+    default: []
   }),
   'log-transaction': flags.boolean({
     char: 't',
@@ -25,22 +27,5 @@ export const startFlags = {
     description:
       'If the data file seems too old, or an invalid Mockoon file, migrate/repair without prompting',
     default: false
-  }),
-  name: flags.string({
-    char: 'n',
-    description:
-      '[deprecated] Select by environment name in the legacy export file',
-    exclusive: ['index']
-  }),
-  index: flags.integer({
-    char: 'i',
-    description:
-      "[deprecated] Select by environment's index in the legacy export file",
-    exclusive: ['name']
-  }),
-  all: flags.boolean({
-    char: 'a',
-    description: '[deprecated] Run all environments in the legacy export file',
-    exclusive: ['name', 'index']
   })
 };

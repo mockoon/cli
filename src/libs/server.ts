@@ -48,8 +48,10 @@ const addEventListeners = function (
   environment: Environment,
   logTransaction?: boolean
 ) {
+  const logMeta: any = { mockName: environment.name };
+
   server.on('started', () => {
-    logger.info(format(Messages.SERVER.STARTED, environment.port));
+    logger.info(format(Messages.SERVER.STARTED, environment.port), logMeta);
 
     if (!!process.send) {
       process.send('ready');
@@ -77,17 +79,24 @@ const addEventListeners = function (
         ServerErrorCodes.PROXY_ERROR
       ].indexOf(errorCode) > -1
     ) {
-      logger.error(error?.message);
+      logger.error(error?.message || '', logMeta);
     }
   });
 
   server.on('creating-proxy', () => {
-    logger.info(format(Messages.SERVER.CREATING_PROXY, environment.proxyHost));
+    logger.info(
+      format(Messages.SERVER.CREATING_PROXY, environment.proxyHost),
+      logMeta
+    );
   });
 
   server.on('transaction-complete', (transaction: Transaction) => {
     transaction.request.method =
       transaction.request.method.toUpperCase() as keyof typeof Methods;
+
+    if (logTransaction) {
+      logMeta.transaction = transaction;
+    }
 
     logger.info(
       `${transaction.request.method.toUpperCase()} ${
@@ -95,12 +104,12 @@ const addEventListeners = function (
       } | ${transaction.response.statusCode}${
         transaction.proxied ? ' | proxied' : ''
       }`,
-      logTransaction ? { transaction } : {}
+      logMeta
     );
   });
 
   server.on('stopped', () => {
-    logger.info(Messages.SERVER.STOPPED);
+    logger.info(Messages.SERVER.STOPPED, logMeta);
   });
 
   process.on('SIGINT', () => {

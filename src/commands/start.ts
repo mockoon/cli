@@ -7,15 +7,10 @@ import { format } from 'util';
 import { Config } from '../config';
 import { commonFlags, startFlags } from '../constants/command.constants';
 import { Messages } from '../constants/messages.constants';
-import { parseDataFile, prepareData } from '../libs/data';
+import { parseDataFiles, prepareEnvironment } from '../libs/data';
 import { ProcessListManager, ProcessManager } from '../libs/process-manager';
 import { createServer } from '../libs/server';
-import {
-  getDirname,
-  portInUse,
-  portIsValid,
-  promptEnvironmentChoice
-} from '../libs/utils';
+import { getDirname, portInUse, portIsValid } from '../libs/utils';
 
 interface EnvironmentInfo {
   name: string;
@@ -28,11 +23,24 @@ interface EnvironmentInfo {
   logTransaction?: boolean;
 }
 
+type StartFlags = {
+  pname: string[];
+  hostname: string[];
+  'daemon-off': boolean;
+  container: boolean;
+  data: string[];
+  port: number[];
+  'log-transaction': boolean;
+  repair: boolean;
+  help: void;
+};
+
 export default class Start extends Command {
-  public static description = 'Start a mock API';
+  public static description = 'Start one or more mock API';
 
   public static examples = [
     '$ mockoon-cli start --data ~/data.json',
+    '$ mockoon-cli start --data ~/data1.json ~/data2.json --port 3000 3001 --pname mock1 mock2',
     '$ mockoon-cli start --data https://file-server/data.json',
     '$ mockoon-cli start --data ~/data.json --pname "proc1"',
     '$ mockoon-cli start --data ~/data.json --daemon-off',
@@ -44,18 +52,21 @@ export default class Start extends Command {
     ...startFlags,
     pname: flags.string({
       char: 'N',
-      description: 'Override the process name'
+      description: 'Override the process(es) name(s)',
+      multiple: true,
+      default: []
     }),
     hostname: flags.string({
       char: 'l',
-      description: 'Listening hostname/address'
+      description: 'Listening hostname(s)',
+      multiple: true,
+      default: []
     }),
     'daemon-off': flags.boolean({
       char: 'D',
       description:
         'Keep the CLI in the foreground and do not manage the process with PM2',
-      default: false,
-      exclusive: ['all']
+      default: false
     }),
     /**
      * /!\ Undocumented flag.
@@ -78,30 +89,38 @@ export default class Start extends Command {
   public async run(): Promise<void> {
     const { flags: userFlags } = this.parse(Start);
 
-    try {
-      const environmentInfoList = await this.getEnvironmentInfoList(userFlags);
+    let environmentsInfo: EnvironmentInfo[] = [];
 
-      for (const environmentInfo of environmentInfoList) {
+    try {
+      // We are in a container, env file is ready and relative to the Dockerfile
+      if (userFlags.container) {
+        environmentsInfo = await this.getEnvInfoListFromContainerFlag(
+          userFlags
+        );
+      } else {
+        const parsedEnvironments = await parseDataFiles(userFlags.data);
+        userFlags.data = parsedEnvironments.filePaths;
+
+        environmentsInfo = await this.getEnvironmentsInfo(
+          userFlags,
+          parsedEnvironments.environments
+        );
+      }
+
+      for (const environmentInfo of environmentsInfo) {
         await this.validatePort(environmentInfo.port, environmentInfo.hostname);
         await this.validateName(environmentInfo.name);
 
-        await this.runEnvironment(environmentInfo, userFlags['daemon-off']);
+        if (userFlags['daemon-off']) {
+          this.startForegroundProcess(environmentInfo);
+        } else {
+          await this.startManagedProcess(environmentInfo);
+        }
       }
     } catch (error: any) {
       this.error(error.message);
     } finally {
       ProcessManager.disconnect();
-    }
-  }
-
-  private async runEnvironment(
-    environmentInfo: EnvironmentInfo,
-    daemonOff = false
-  ) {
-    if (daemonOff) {
-      this.startForegroundProcess(environmentInfo);
-    } else {
-      await this.startManagedProcess(environmentInfo);
     }
   }
 
@@ -202,76 +221,56 @@ export default class Start extends Command {
     this.error(format(Messages.CLI.PROCESS_START_LOG_ERROR, name, name));
   }
 
-  private async getEnvironmentInfoList(userFlags): Promise<EnvironmentInfo[]> {
-    // We are in a container, env file is ready and relative to the Dockerfile
-    if (userFlags.container) {
-      return this.getEnvInfoListFromContainerFlag(userFlags);
-    }
-
-    return this.getEnvInfoListFromNonContainerFlag(userFlags);
-  }
-
   private async getEnvInfoListFromContainerFlag(
-    userFlags
+    userFlags: StartFlags
   ): Promise<EnvironmentInfo[]> {
-    const environment: Environment = await readJSONFile(
-      userFlags.data,
-      'utf-8'
-    );
-    let protocol = 'http';
+    const environmentsInfo: EnvironmentInfo[] = [];
 
-    if (environment.tlsOptions.enabled) {
-      protocol = 'https';
-    }
+    for (const dataFile of userFlags.data) {
+      const environment: Environment = await readJSONFile(dataFile, 'utf-8');
 
-    return [
-      {
+      let protocol = 'http';
+
+      if (environment.tlsOptions.enabled) {
+        protocol = 'https';
+      }
+
+      environmentsInfo.push({
         protocol,
-        dataFile: userFlags.data,
+        dataFile,
         name: environment.name,
         hostname: environment.hostname,
         port: environment.port,
         endpointPrefix: environment.endpointPrefix,
         initialDataDir: null,
         logTransaction: userFlags['log-transaction']
-      }
-    ];
-  }
-
-  private async getEnvInfoListFromNonContainerFlag(
-    userFlags
-  ): Promise<EnvironmentInfo[]> {
-    const environments = await parseDataFile(userFlags.data);
-
-    if (userFlags.all) {
-      return this.getEnvInfoFromEnvironments(userFlags, environments);
+      });
     }
 
-    return this.getEnvInfoFromUserChoice(userFlags, environments);
+    return environmentsInfo;
   }
 
-  private async getEnvInfoFromEnvironments(
-    userFlags,
+  private async getEnvironmentsInfo(
+    userFlags: StartFlags,
     environments: Environments
   ): Promise<EnvironmentInfo[]> {
-    const environmentInfoList: EnvironmentInfo[] = [];
+    const environmentsInfo: EnvironmentInfo[] = [];
 
     for (let envIndex = 0; envIndex < environments.length; envIndex++) {
       try {
-        const environmentInfo = await prepareData({
-          environments,
-          options: {
-            index: envIndex,
-            name: environments[envIndex].name,
-            port: environments[envIndex].port,
-            endpointPrefix: environments[envIndex].endpointPrefix
+        const environmentInfo = await prepareEnvironment({
+          environment: environments[envIndex],
+          userOptions: {
+            hostname: userFlags.hostname[envIndex],
+            pname: userFlags.pname[envIndex],
+            port: userFlags.port[envIndex]
           },
           repair: userFlags.repair
         });
 
-        environmentInfoList.push({
+        environmentsInfo.push({
           ...environmentInfo,
-          initialDataDir: getDirname(userFlags.data),
+          initialDataDir: getDirname(userFlags.data[envIndex]),
           logTransaction: userFlags['log-transaction']
         });
       } catch (error: any) {
@@ -279,40 +278,7 @@ export default class Start extends Command {
       }
     }
 
-    return environmentInfoList;
-  }
-
-  private async getEnvInfoFromUserChoice(
-    userFlags,
-    environments: Environments
-  ): Promise<EnvironmentInfo[]> {
-    userFlags = await promptEnvironmentChoice(userFlags, environments);
-
-    let environmentInfo: EnvironmentInfo;
-
-    try {
-      environmentInfo = await prepareData({
-        environments,
-        options: {
-          index: userFlags.index,
-          name: userFlags.name,
-          port: userFlags.port,
-          hostname: userFlags.hostname,
-          pname: userFlags.pname
-        },
-        repair: userFlags.repair
-      });
-    } catch (error: any) {
-      this.error(error.message);
-    }
-
-    return [
-      {
-        ...environmentInfo,
-        initialDataDir: getDirname(userFlags.data),
-        logTransaction: userFlags['log-transaction']
-      }
-    ];
+    return environmentsInfo;
   }
 
   private async validateName(name: string) {

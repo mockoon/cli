@@ -14,7 +14,6 @@ import { prompt } from 'inquirer';
 import * as mkdirp from 'mkdirp';
 import { join } from 'path';
 import { ProcessDescription } from 'pm2';
-import { format } from 'util';
 import { Config } from '../config';
 import { Messages } from '../constants/messages.constants';
 import { transformEnvironmentName } from './utils';
@@ -22,51 +21,71 @@ import { transformEnvironmentName } from './utils';
 /**
  * Load and parse a JSON data file.
  * Supports both legacy export files (with one or multiple envs) or new environment files.
+ * If a legacy export is encountered, unwrap it and update `--data` flag to reflect the number of environments unwrapped
  *
  * @param filePath
  */
-export const parseDataFile = async (
-  filePath: string
-): Promise<Environments> => {
+export const parseDataFiles = async (
+  filePaths: string[]
+): Promise<{ filePaths: string[]; environments: Environments }> => {
   const openAPIConverter = new OpenAPIConverter();
   let environments: Environments = [];
+  let newFilePaths: string[] = [];
 
-  try {
-    const environment = await openAPIConverter.convertFromOpenAPI(filePath);
+  let filePathIndex = 0;
 
-    if (environment) {
-      environments.push(environment);
-    }
-  } catch (openAPIError: any) {
+  for (const filePath of filePaths) {
     try {
-      let data: any;
+      const environment = await openAPIConverter.convertFromOpenAPI(filePath);
 
-      if (filePath.startsWith('http')) {
-        data = (await axios.get(filePath, { timeout: 30000 })).data;
-      } else {
-        data = await fs.readFile(filePath, { encoding: 'utf-8' });
+      if (environment) {
+        environments.push(environment);
+        newFilePaths.push(filePath);
       }
+    } catch (openAPIError: any) {
+      try {
+        let data: any;
 
-      if (typeof data === 'string') {
-        data = JSON.parse(data);
-      }
+        if (filePath.startsWith('http')) {
+          data = (await axios.get(filePath, { timeout: 30000 })).data;
+        } else {
+          data = await fs.readFile(filePath, { encoding: 'utf-8' });
+        }
 
-      if (IsLegacyExportData(data)) {
-        // Extract all environments, eventually filter items of type 'route'
-        environments = UnwrapLegacyExport(data);
-      } else if (typeof data === 'object') {
-        environments.push(data);
+        if (typeof data === 'string') {
+          data = JSON.parse(data);
+        }
+
+        if (IsLegacyExportData(data)) {
+          const unwrappedExport = UnwrapLegacyExport(data);
+
+          // Extract all environments, eventually filter items of type 'route'
+          environments = [...environments, ...unwrappedExport];
+
+          // if we unwrapped more than one exported environment, add as many `--data` flag entries
+          if (unwrappedExport.length >= 1) {
+            newFilePaths = [
+              ...newFilePaths,
+              ...new Array(unwrappedExport.length).fill(filePath)
+            ];
+          }
+        } else if (typeof data === 'object') {
+          environments.push(data);
+          newFilePaths.push(filePath);
+        }
+      } catch (JSONError: any) {
+        throw new Error(`${Messages.CLI.DATA_INVALID}: ${JSONError.message}`);
       }
-    } catch (JSONError: any) {
-      throw new Error(`${Messages.CLI.DATA_INVALID}: ${JSONError.message}`);
     }
+
+    filePathIndex++;
   }
 
   if (environments.length === 0) {
     throw new Error(Messages.CLI.ENVIRONMENT_NOT_AVAILABLE_ERROR);
   }
 
-  return environments;
+  return { filePaths: newFilePaths, environments };
 };
 
 /**
@@ -78,7 +97,6 @@ export const parseDataFile = async (
  */
 const migrateAndValidateEnvironment = async (
   environment: Environment,
-  environmentName: string | undefined,
   forceRepair?: boolean
 ) => {
   // environment data are too old: lastMigration is not present
@@ -87,7 +105,7 @@ const migrateAndValidateEnvironment = async (
       {
         name: 'repair',
         message: `${
-          environmentName ? '"' + environmentName + '"' : 'This environment'
+          environment.name ? '"' + environment.name + '"' : 'This environment'
         } does not seem to be a valid Mockoon environment or is too old. Let Mockoon attempt to repair it?`,
         type: 'confirm',
         default: true
@@ -121,63 +139,18 @@ const migrateAndValidateEnvironment = async (
 };
 
 /**
- * Check if data file is in the new format (with data and source)
- * and return the environment by index or name
- *
- * @param data
- * @param options
- */
-const getEnvironment = (
-  environments: Environments,
-  options: { name?: string; index?: number }
-): Environment => {
-  let findError: string;
-
-  // find environment by index
-  if (options.index !== undefined && environments[options.index]) {
-    return environments[options.index];
-  } else {
-    findError = format(
-      Messages.CLI.ENVIRONMENT_NOT_FOUND_INDEX_ERROR,
-      options.index
-    );
-  }
-
-  // find by name
-  if (options.name) {
-    const foundEnvironment = environments.find(
-      (environment) => environment.name === options.name
-    );
-
-    if (foundEnvironment) {
-      return foundEnvironment;
-    } else {
-      findError = format(
-        Messages.CLI.ENVIRONMENT_NOT_FOUND_NAME_ERROR,
-        options.name
-      );
-    }
-  }
-
-  throw new Error(findError);
-};
-
-/**
- * Load the data file, find and migrate the environment
- * copy the environment to a new temporary file.
+ * Migrate the environment
+ * Copy the environment to a new temporary file.
  *
  * @param environments - path to the data file or export data
  * @param options
  */
-export const prepareData = async (parameters: {
-  environments: Environments;
-  options: {
-    name?: string;
-    index?: number;
+export const prepareEnvironment = async (params: {
+  environment: Environment;
+  userOptions: {
     port?: number;
     pname?: string;
     hostname?: string;
-    endpointPrefix?: string;
   };
   dockerfileDir?: string;
   repair?: boolean;
@@ -189,51 +162,44 @@ export const prepareData = async (parameters: {
   port: number;
   dataFile: string;
 }> => {
-  let environment: Environment = getEnvironment(
-    parameters.environments,
-    parameters.options
-  );
-
-  environment = await migrateAndValidateEnvironment(
-    environment,
-    parameters.options.name,
-    parameters.repair
+  params.environment = await migrateAndValidateEnvironment(
+    params.environment,
+    params.repair
   );
 
   // transform the provided name or env's name to be used as process name
-  environment.name = transformEnvironmentName(
-    parameters.options.pname || environment.name
+  params.environment.name = transformEnvironmentName(
+    params.userOptions.pname || params.environment.name
   );
 
-  if (parameters.options.port !== undefined) {
-    environment.port = parameters.options.port;
+  if (params.userOptions.port !== undefined) {
+    params.environment.port = params.userOptions.port;
   }
 
-  if (parameters.options.hostname !== undefined) {
-    environment.hostname = parameters.options.hostname;
+  if (params.userOptions.hostname !== undefined) {
+    params.environment.hostname = params.userOptions.hostname;
   }
 
-  if (parameters.options.endpointPrefix !== undefined) {
-    environment.endpointPrefix = parameters.options.endpointPrefix;
-  }
-
-  let dataFile: string = join(Config.dataPath, `${environment.name}.json`);
+  let dataFile: string = join(
+    Config.dataPath,
+    `${params.environment.name}.json`
+  );
 
   // if we are building a Dockerfile, we want the data in the same folder
-  if (parameters.dockerfileDir) {
-    await mkdirp(parameters.dockerfileDir);
-    dataFile = `${parameters.dockerfileDir}/${environment.name}.json`;
+  if (params.dockerfileDir) {
+    await mkdirp(params.dockerfileDir);
+    dataFile = `${params.dockerfileDir}/${params.environment.name}.json`;
   }
 
   // save environment to data path
-  await fs.writeFile(dataFile, JSON.stringify(environment));
+  await fs.writeFile(dataFile, JSON.stringify(params.environment));
 
   return {
-    name: environment.name,
-    protocol: environment.tlsOptions.enabled ? 'https' : 'http',
-    hostname: environment.hostname,
-    port: environment.port,
-    endpointPrefix: environment.endpointPrefix,
+    name: params.environment.name,
+    protocol: params.environment.tlsOptions.enabled ? 'https' : 'http',
+    hostname: params.environment.hostname,
+    port: params.environment.port,
+    endpointPrefix: params.environment.endpointPrefix,
     dataFile
   };
 };

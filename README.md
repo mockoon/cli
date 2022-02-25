@@ -79,7 +79,7 @@ $ mockoon-cli start --data https://domain.com/your-environment-file.json
 
 > **Use a legacy export file**
 >
-> While we recommend using the method above to launch your mocks with the CLI, you can still use Mockoon's [legacy export files](https://mockoon.com/docs/latest/mockoon-data-files/import-export-mockoon-format/) and the dedicated flags `--index`, `--name` or `--all`.
+> While we recommend using the method above to launch your mocks with the CLI, you can still use Mockoon's [legacy export files](https://mockoon.com/docs/latest/mockoon-data-files/import-export-mockoon-format/).
 
 ### Use an OpenAPI specification file
 
@@ -111,9 +111,10 @@ Mockoon's CLI has been tested on Node.js versions 12, 14, 15 and 16.
 
 ### `mockoon-cli start`
 
-Starts a mock API from a Mockoon's environment file.
+Starts one (or more) mock API from Mockoon's environment file(s).
 
 The process will be created by default with the name and port of the Mockoon's environment. You can override these values by using the `--port` and `--pname` flags.
+`--data`, `--port`, `--pname` and `--hostname` flags support multiple entries to run multiple mock APIs at once (see examples below).
 
 Using the `--daemon-off` flag will keep the CLI in the foreground. The mock API process will not be [managed by PM2](#pm2). When running as a blocking process, all the logs are sent to both stdout (console) and the [usual files](logs).
 
@@ -124,27 +125,22 @@ USAGE
   $ mockoon-cli start
 
 OPTIONS
-  -d, --data=data         [required] Path or URL to your Mockoon file
-  -N, --pname=pname       Override process name
-  -p, --port=port         Override environment's port
-  -l, --hostname=0.0.0.0  Override default listening hostname (0.0.0.0)
+  -d, --data              [required] Path(s) or URL(s) to your Mockoon file(s)
+  -N, --pname             Override process(es) name(s)
+  -p, --port              Override environment(s) port(s)
+  -l, --hostname=0.0.0.0  Override default listening hostname(s) (0.0.0.0)
   -t, --log-transaction   Log the full HTTP transaction (request and response)
   -r, --repair            If the data file seems too old, or an invalid Mockoon file, migrate/repair without prompting
   -D, --daemon-off        Keep the CLI in the foreground and do not manage the process with PM2
-  -a, --all               [deprecated] Run all environments in the legacy export file
-  -i, --index=index       [deprecated] Select by environment's index in the legacy export file
-  -n, --name=name         [deprecated] Seelct by environment name in the legacy export file
   -h, --help              Show CLI help
 
 EXAMPLES
   $ mockoon-cli start --data ~/data.json
+  $ mockoon-cli start --data ~/data1.json ~/data2.json --port 3000 3001 --pname mock1 mock2
   $ mockoon-cli start --data https://file-server/data.json
   $ mockoon-cli start --data ~/data.json --pname "proc1"
   $ mockoon-cli start --data ~/data.json --daemon-off
   $ mockoon-cli start --data ~/data.json --log-transaction
-  $ mockoon-cli start --data ~/data.json --all
-  $ mockoon-cli start --data ~/data.json --name "Mock environment"
-  $ mockoon-cli start --data ~/data.json --index 0
 ```
 
 ### `mockoon-cli list [ID]`
@@ -194,10 +190,10 @@ EXAMPLE
 
 ### `mockoon-cli dockerize`
 
-Generates a Dockerfile used to build a self-contained image of a mock API. After building the image, no additional parameters will be needed when running the container.
+Generates a Dockerfile used to build a self-contained image of one or more mock API. After building the image, no additional parameters will be needed when running the container.
 This command takes similar flags as the [`start` command](#mockoon-start).
 
-Please note that this command will extract your Mockoon environment from the file you provide and put it side by side with the generated Dockerfile. Both files are required in order to build the image.
+Please note that this command will copy your Mockoon environment from the file you provide and put it side by side with the generated Dockerfile. Both files are required in order to build the image.
 
 For more information on how to build the image: [Using the dockerize command](#using-the-dockerize-command)
 
@@ -206,17 +202,16 @@ USAGE
   $ mockoon-cli dockerize
 
 OPTIONS
-  -d, --data=data         [required] Path or URL to your Mockoon file
-  -p, --port=port         Override environment's port
+  -d, --data              [required] Path or URL to your Mockoon file
+  -p, --port              Override environment's port
   -o, --output            [required] Generated Dockerfile path and name (e.g. `./Dockerfile`)
   -t, --log-transaction   Log the full HTTP transaction (request and response)
   -r, --repair            If the data file seems too old, or an invalid Mockoon file, migrate/repair without prompting
-  -i, --index=index       [deprecated] Select by environment's index in the legacy export file
-  -n, --name=name         [deprecated] Select by environment name in the legacy export file
   -h, --help              Show CLI help
 
 EXAMPLES
   $ mockoon-cli dockerize --data ~/data.json --output ./Dockerfile
+  $ mockoon-cli dockerize --data ~/data1.json ~/data2.json --output ./Dockerfile
   $ mockoon-cli dockerize --data https://file-server/data.json --output ./Dockerfile
 ```
 
@@ -327,7 +322,7 @@ The `transaction` model can be found [here](https://github.com/mockoon/commons/b
 
 ## PM2
 
-Mockoon CLI uses [PM2](https://pm2.keymetrics.io/) to start, stop or list the running mock APIs. Therefore, you can directly use PM2 commands to manage the processes.
+Mockoon CLI uses [PM2](https://pm2.keymetrics.io/) to start, stop or list the running mock APIs when you are not using the `--daemon-off` flag. Therefore, you can directly use PM2 commands to manage the processes.
 
 ## Mockoon's documentation
 
