@@ -59,7 +59,7 @@
     "inquirer": "8.2.0",
     "is-port-reachable": "3.0.0",
     "jsonfile": "6.1.0",
-    "minimist": "1.2.5",
+    "minimist": "1.2.6",
     "mkdirp": "1.0.4",
     "mustache": "4.2.0",
     "pm2": "5.1.2",
