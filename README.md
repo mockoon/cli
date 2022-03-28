@@ -1,3 +1,5 @@
+> # 📦This repository has been archived. You will find Mockoon's new monorepo [here](https://github.com/mockoon/mockoon).
+
 <div align="center">
   <a href="https://mockoon.com" alt="mockoon logo">
     <img width="200" height="200" src="https://mockoon.com/images/logo-square-cli.png">
